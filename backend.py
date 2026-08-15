@@ -326,28 +326,57 @@ def predict_risk(lat, lon, time=None):
 def get_risk_grid(time=None):
     """
     Generate risk predictions for the complete map grid
-    for a particular time bucket.
+    for a particular time bucket using high-speed vectorized batch inference.
     """
 
     time_bucket = normalize_time(time)
 
     grid = df[df["time_bucket"] == time_bucket].copy()
+    if grid.empty:
+        return []
+
+    # Vectorized feature matrix
+    zone_encs = [encode_zone(z) for z in grid["zone_type"]]
+    time_encs = [encode_time(tb) for tb in grid["time_bucket"]]
+
+    X = pd.DataFrame({
+        "lighting_score": grid["lighting_score"].astype(float).values,
+        "streetlight_operational_pct": grid["streetlight_operational_pct"].astype(float).values,
+        "crowd_density": grid["crowd_density"].astype(float).values,
+        "historical_incidents_annual": grid["historical_incidents_annual"].astype(float).values,
+        "unsafe_reports_count": grid["unsafe_reports_count"].astype(float).values,
+        "zone_type_enc": zone_encs,
+        "time_bucket_enc": time_encs,
+        "dist_to_anchor_km": grid["dist_to_anchor_km"].astype(float).values,
+        "dist_from_center_km": grid["dist_from_center_km"].astype(float).values,
+    })[MODEL_FEATURES]
+
+    preds = np.clip(model.predict(X), 0.0, 100.0)
+    bands = [get_risk_band(s) for s in preds]
+
+    grid["score"] = np.round(preds, 1)
+    grid["band"] = bands
 
     results = []
-
-    for _, row in grid.iterrows():
-
-        score = _predict_row(row)
-
+    for seg_id, lat, lon, score, band, tb, zt, lm in zip(
+        grid["segment_id"],
+        grid["lat_center"],
+        grid["lon_center"],
+        grid["score"],
+        grid["band"],
+        grid["time_bucket"],
+        grid["zone_type"],
+        grid["nearest_landmark"],
+    ):
         results.append({
-            "segment_id": row["segment_id"],
-            "lat": float(row["lat_center"]),
-            "lon": float(row["lon_center"]),
-            "score": round(score, 1),
-            "band": get_risk_band(score),
-            "time_bucket": time_bucket,
-            "zone_type": row["zone_type"],
-            "landmark": row["nearest_landmark"]
+            "segment_id": seg_id,
+            "lat": float(lat),
+            "lon": float(lon),
+            "score": float(score),
+            "band": band,
+            "time_bucket": tb,
+            "zone_type": zt,
+            "landmark": lm,
         })
 
     return results
