@@ -63,7 +63,7 @@ st.set_page_config(
 # ============================================================
 CITY_CENTER = [20.2961, 85.8245]  # Bhubaneswar Center
 
-# Ultra-vibrant solid colors for guaranteed high-visibility across all screens
+# High-contrast solid colors for guaranteed high-visibility across all screens
 BAND_COLORS = {
     "low": "#00FF66",     # Radiant Neon Green (Low Risk / Safe Zone)
     "medium": "#FFB300",  # Radiant Solar Amber (Moderate Risk / Caution)
@@ -300,13 +300,90 @@ st.markdown(
         margin-bottom: 4px !important;
     }
 
+    /* Selectbox Input Box */
     div[data-baseweb="select"] > div,
     div[data-baseweb="input"] > div {
-        background-color: rgba(14, 16, 36, 0.95) !important;
-        border: 1px solid rgba(255, 42, 133, 0.4) !important;
+        background-color: rgba(16, 20, 44, 0.98) !important;
+        border: 1px solid rgba(255, 42, 133, 0.5) !important;
         border-radius: 8px !important;
         color: #FFFFFF !important;
     }
+
+    /* Selectbox Text Inside Box */
+    div[data-baseweb="select"] span,
+    div[data-baseweb="select"] div,
+    div[data-baseweb="select"] input {
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+    }
+
+    /* ============================================================
+       DROPDOWN POPOVER AND OPTION LIST - HIGH CONTRAST DARK THEME
+       ============================================================ */
+    div[data-baseweb="popover"],
+    div[data-baseweb="popover"] > div,
+    div[data-baseweb="menu"],
+    div[data-baseweb="menu"] > div,
+    ul[role="listbox"],
+    div[data-testid="stSelectboxVirtualDropdown"] {
+        background-color: #0A0C20 !important;
+        background: #0A0C20 !important;
+        border: 2px solid #FF2A85 !important;
+        border-radius: 12px !important;
+        box-shadow: 0 16px 45px rgba(0, 0, 0, 0.95) !important;
+        padding: 6px 4px !important;
+    }
+
+    /* ALL POPOVER TEXT AND ELEMENTS */
+    div[data-baseweb="popover"] *,
+    div[data-baseweb="menu"] *,
+    ul[role="listbox"] *,
+    li[role="option"],
+    li[role="option"] * {
+        background-color: #0A0C20 !important;
+        background: #0A0C20 !important;
+        color: #FFFFFF !important;
+        -webkit-text-fill-color: #FFFFFF !important;
+        font-family: 'Outfit', sans-serif !important;
+        font-size: 0.95rem !important;
+        font-weight: 700 !important;
+        opacity: 1 !important;
+    }
+
+    li[role="option"] {
+        padding: 10px 14px !important;
+        border-radius: 8px !important;
+        margin-bottom: 2px !important;
+        cursor: pointer !important;
+    }
+
+    /* HOVER STATE ON DROPDOWN OPTIONS */
+    li[role="option"]:hover,
+    li[role="option"]:hover *,
+    div[data-baseweb="popover"] li:hover,
+    div[data-baseweb="popover"] li:hover * {
+        background-color: rgba(255, 42, 133, 0.35) !important;
+        background: rgba(255, 42, 133, 0.35) !important;
+        color: #00FF66 !important;
+        -webkit-text-fill-color: #00FF66 !important;
+        font-weight: 800 !important;
+    }
+
+    /* SELECTED STATE ON DROPDOWN OPTIONS */
+    li[role="option"][aria-selected="true"],
+    li[role="option"][aria-selected="true"] *,
+    div[data-baseweb="popover"] li[aria-selected="true"],
+    div[data-baseweb="popover"] li[aria-selected="true"] * {
+        background-color: rgba(255, 42, 133, 0.55) !important;
+        background: rgba(255, 42, 133, 0.55) !important;
+        color: #FFD1E6 !important;
+        -webkit-text-fill-color: #FFD1E6 !important;
+        font-weight: 800 !important;
+        border-left: 3px solid #00FF66 !important;
+    }
+
+
 
     /* Tabs Styling */
     .stTabs [data-baseweb="tab-list"] {
@@ -424,13 +501,20 @@ if "time_of_day" not in st.session_state:
 if "selected_point" not in st.session_state:
     st.session_state["selected_point"] = CITY_CENTER
 
-if "start_coords" not in st.session_state:
-    st.session_state["start_coords"] = POPULAR_LANDMARKS["KIIT Campus, Patia"]
-    st.session_state["start_name"] = "KIIT Campus, Patia"
+# Route State Management
+if "start_lat" not in st.session_state:
+    st.session_state["start_lat"] = POPULAR_LANDMARKS["KIIT Campus, Patia"][0]
+if "start_lon" not in st.session_state:
+    st.session_state["start_lon"] = POPULAR_LANDMARKS["KIIT Campus, Patia"][1]
+if "start_choice" not in st.session_state:
+    st.session_state["start_choice"] = "KIIT Campus, Patia"
 
-if "end_coords" not in st.session_state:
-    st.session_state["end_coords"] = POPULAR_LANDMARKS["Esplanade One Mall, Rasulgarh"]
-    st.session_state["end_name"] = "Esplanade One Mall, Rasulgarh"
+if "end_lat" not in st.session_state:
+    st.session_state["end_lat"] = POPULAR_LANDMARKS["Esplanade One Mall, Rasulgarh"][0]
+if "end_lon" not in st.session_state:
+    st.session_state["end_lon"] = POPULAR_LANDMARKS["Esplanade One Mall, Rasulgarh"][1]
+if "end_choice" not in st.session_state:
+    st.session_state["end_choice"] = "Esplanade One Mall, Rasulgarh"
 
 if "calculated_route" not in st.session_state:
     st.session_state["calculated_route"] = None
@@ -440,9 +524,6 @@ if "report_success_toast" not in st.session_state:
 
 if "fake_call_step" not in st.session_state:
     st.session_state["fake_call_step"] = "idle"
-
-if "map_selection_mode" not in st.session_state:
-    st.session_state["map_selection_mode"] = "start"
 
 # ============================================================
 # 5. CACHED BACKEND DATA LOADER
@@ -755,7 +836,7 @@ with tab_map:
             unsafe_allow_html=True,
         )
 
-        # Generate Folium Map with prefer_canvas=True (no flickering/lightening)
+        # Generate Folium Map with Canvas hardware acceleration
         current_map = generate_leaflet_map(
             risk_grid=risk_grid,
             route_data=st.session_state.get("calculated_route"),
@@ -779,18 +860,10 @@ with tab_map:
             clicked_coords = (clicked_lat, clicked_lng)
             st.session_state["selected_point"] = [clicked_lat, clicked_lng]
 
-            # If user is in "Pick on Map" mode for routing
-            if st.session_state.get("map_selection_mode") == "start":
-                st.session_state["start_coords"] = (clicked_lat, clicked_lng)
-                st.session_state["start_name"] = f"Map Pin ({clicked_lat:.4f}, {clicked_lng:.4f})"
-            elif st.session_state.get("map_selection_mode") == "end":
-                st.session_state["end_coords"] = (clicked_lat, clicked_lng)
-                st.session_state["end_name"] = f"Map Pin ({clicked_lat:.4f}, {clicked_lng:.4f})"
-
-        st.markdown("<div style='color: #E2E8F0; font-size: 0.85rem; margin-top: 4px;'>Tip: Select 'Pick on Map' mode on the right to set Start or Destination by clicking anywhere on the map.</div>", unsafe_allow_html=True)
+        st.markdown("<div style='color: #E2E8F0; font-size: 0.85rem; margin-top: 4px;'>Click any point on the map to inspect or set it as a start/end location.</div>", unsafe_allow_html=True)
 
     # ------------------------------------------------------------
-    # RIGHT COMMAND DECK: USER-FRIENDLY ROUTING AND REPORTING
+    # RIGHT COMMAND DECK: RELIABLE ROUTING AND REPORTING
     # ------------------------------------------------------------
     with panel_col:
         deck_tab_route, deck_tab_report, deck_tab_spot = st.tabs([
@@ -800,113 +873,112 @@ with tab_map:
         ])
 
         # ------------------------------------------------------------
-        # SUB-TAB 1: USER-FRIENDLY AI SAFE ROUTE GENERATOR
+        # SUB-TAB 1: RELIABLE & INTUITIVE AI SAFE ROUTE GENERATOR
         # ------------------------------------------------------------
         with deck_tab_route:
             st.markdown("<div class='section-head'>AI Safe Route Navigator</div>", unsafe_allow_html=True)
             st.markdown("<div class='section-desc'>Calculates safer alternative paths avoiding unlit streets and high incident zones.</div>", unsafe_allow_html=True)
 
-            route_input_method = st.radio(
-                "Input Mode",
-                options=["Landmark Directory", "Pick on Map", "Enter Coordinates"],
-                horizontal=True,
-                key="route_input_mode_radio",
+            # 1. Quick Map-Click Assignment Strip
+            cur_click = st.session_state.get("selected_point", CITY_CENTER)
+            st.markdown(
+                f"""
+                <div style="background: rgba(14,16,36,0.95); border: 1px solid rgba(0,255,102,0.3); border-radius: 8px; padding: 8px 10px; margin-bottom: 10px;">
+                    <div style="font-size: 0.78rem; font-weight: 700; color: #CBD5E1;">CURRENT MAP PIN: <code>{cur_click[0]:.5f}, {cur_click[1]:.5f}</code></div>
+                </div>
+                """,
+                unsafe_allow_html=True,
             )
 
-            # MODE A: Landmark Directory (User Friendly Default)
-            if route_input_method == "Landmark Directory":
-                landmark_names = list(POPULAR_LANDMARKS.keys())
+            c_pin_s, c_pin_e = st.columns(2)
+            with c_pin_s:
+                if st.button("Set Pin as Start", key="btn_quick_pin_start"):
+                    st.session_state["start_lat"] = cur_click[0]
+                    st.session_state["start_lon"] = cur_click[1]
+                    st.session_state["start_choice"] = f"Map Pin ({cur_click[0]:.4f}, {cur_click[1]:.4f})"
+                    st.rerun()
+            with c_pin_e:
+                if st.button("Set Pin as Destination", key="btn_quick_pin_end"):
+                    st.session_state["end_lat"] = cur_click[0]
+                    st.session_state["end_lon"] = cur_click[1]
+                    st.session_state["end_choice"] = f"Map Pin ({cur_click[0]:.4f}, {cur_click[1]:.4f})"
+                    st.rerun()
 
-                # Origin selector
-                default_start_idx = landmark_names.index("KIIT Campus, Patia") if "KIIT Campus, Patia" in landmark_names else 0
-                chosen_start_name = st.selectbox(
-                    "Start Location (Origin)",
-                    options=landmark_names,
-                    index=default_start_idx,
-                    key="sel_start_landmark",
-                )
-                st.session_state["start_coords"] = POPULAR_LANDMARKS[chosen_start_name]
-                st.session_state["start_name"] = chosen_start_name
+            st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-                # Swap button
-                c_swap1, c_swap2 = st.columns([3, 1])
-                with c_swap2:
-                    if st.button("Swap Locations", key="btn_swap_landmarks"):
-                        temp_c = st.session_state["start_coords"]
-                        temp_n = st.session_state["start_name"]
-                        st.session_state["start_coords"] = st.session_state["end_coords"]
-                        st.session_state["start_name"] = st.session_state["end_name"]
-                        st.session_state["end_coords"] = temp_c
-                        st.session_state["end_name"] = temp_n
-                        st.rerun()
+            # 2. Start Location Selector
+            landmark_options_start = list(POPULAR_LANDMARKS.keys())
+            if st.session_state["start_choice"] not in landmark_options_start:
+                landmark_options_start.insert(0, st.session_state["start_choice"])
 
-                # Destination selector
-                default_end_idx = landmark_names.index("Esplanade One Mall, Rasulgarh") if "Esplanade One Mall, Rasulgarh" in landmark_names else 1
-                chosen_end_name = st.selectbox(
-                    "End Location (Destination)",
-                    options=landmark_names,
-                    index=default_end_idx,
-                    key="sel_end_landmark",
-                )
-                st.session_state["end_coords"] = POPULAR_LANDMARKS[chosen_end_name]
-                st.session_state["end_name"] = chosen_end_name
+            start_idx = landmark_options_start.index(st.session_state["start_choice"]) if st.session_state["start_choice"] in landmark_options_start else 0
 
-            # MODE B: Pick on Map
-            elif route_input_method == "Pick on Map":
+            def on_start_landmark_change():
+                selected = st.session_state["widget_start_select"]
+                st.session_state["start_choice"] = selected
+                if selected in POPULAR_LANDMARKS:
+                    st.session_state["start_lat"] = POPULAR_LANDMARKS[selected][0]
+                    st.session_state["start_lon"] = POPULAR_LANDMARKS[selected][1]
+
+            st.selectbox(
+                "Start Location (Origin)",
+                options=landmark_options_start,
+                index=start_idx,
+                key="widget_start_select",
+                on_change=on_start_landmark_change,
+            )
+
+            # 3. Swap Origin & Destination Button
+            c_info, c_swap = st.columns([3, 1.5])
+            with c_info:
                 st.markdown(
-                    """
-                    <div style="background: rgba(18,20,42,0.95); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,102,0.4); font-size: 0.88rem; color: #FFFFFF;">
-                        Select which point to set, then click anywhere on the map:
-                    </div>
-                    """,
+                    f"<div style='font-size:0.8rem; color:#00FF66; padding-top:4px;'>Origin Coordinates: <code>{st.session_state['start_lat']:.5f}, {st.session_state['start_lon']:.5f}</code></div>",
                     unsafe_allow_html=True,
                 )
+            with c_swap:
+                if st.button("Swap Locations", key="btn_swap_locations_bar"):
+                    t_lat, t_lon, t_choice = st.session_state["start_lat"], st.session_state["start_lon"], st.session_state["start_choice"]
+                    st.session_state["start_lat"] = st.session_state["end_lat"]
+                    st.session_state["start_lon"] = st.session_state["end_lon"]
+                    st.session_state["start_choice"] = st.session_state["end_choice"]
+                    st.session_state["end_lat"] = t_lat
+                    st.session_state["end_lon"] = t_lon
+                    st.session_state["end_choice"] = t_choice
+                    st.rerun()
 
-                st.session_state["map_selection_mode"] = st.radio(
-                    "Clicking Map Sets:",
-                    options=["Start Location", "Destination Location"],
-                    index=0 if st.session_state.get("map_selection_mode") == "start" else 1,
-                    horizontal=True,
-                )
-                if st.session_state["map_selection_mode"] == "Start Location":
-                    st.session_state["map_selection_mode"] = "start"
-                else:
-                    st.session_state["map_selection_mode"] = "end"
+            # 4. Destination Location Selector
+            landmark_options_end = list(POPULAR_LANDMARKS.keys())
+            if st.session_state["end_choice"] not in landmark_options_end:
+                landmark_options_end.insert(0, st.session_state["end_choice"])
 
-                st.markdown(
-                    f"""
-                    <div style="margin-top: 8px; font-size: 0.85rem; color: #FFFFFF; background: rgba(14,16,36,0.9); padding: 8px; border-radius: 6px;">
-                        • <strong>Origin:</strong> <span style="color:#00FF66;">{st.session_state.get('start_name', 'Not set')}</span> <code>({st.session_state['start_coords'][0]:.4f}, {st.session_state['start_coords'][1]:.4f})</code><br>
-                        • <strong>Destination:</strong> <span style="color:#FF1744;">{st.session_state.get('end_name', 'Not set')}</span> <code>({st.session_state['end_coords'][0]:.4f}, {st.session_state['end_coords'][1]:.4f})</code>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+            end_idx = landmark_options_end.index(st.session_state["end_choice"]) if st.session_state["end_choice"] in landmark_options_end else 1
 
-            # MODE C: Enter Coordinates
-            else:
-                st.markdown("<div style='font-size:0.85rem; font-weight:800; color:#00FF66; margin-top:6px;'>ORIGIN COORDINATES</div>", unsafe_allow_html=True)
-                rc1, rc2 = st.columns(2)
-                with rc1:
-                    s_lat = st.number_input("Start Lat", value=float(st.session_state["start_coords"][0]), format="%.5f", key="man_start_lat")
-                with rc2:
-                    s_lon = st.number_input("Start Lon", value=float(st.session_state["start_coords"][1]), format="%.5f", key="man_start_lon")
-                st.session_state["start_coords"] = (s_lat, s_lon)
+            def on_end_landmark_change():
+                selected = st.session_state["widget_end_select"]
+                st.session_state["end_choice"] = selected
+                if selected in POPULAR_LANDMARKS:
+                    st.session_state["end_lat"] = POPULAR_LANDMARKS[selected][0]
+                    st.session_state["end_lon"] = POPULAR_LANDMARKS[selected][1]
 
-                st.markdown("<div style='font-size:0.85rem; font-weight:800; color:#FF1744; margin-top:4px;'>DESTINATION COORDINATES</div>", unsafe_allow_html=True)
-                rc3, rc4 = st.columns(2)
-                with rc3:
-                    e_lat = st.number_input("End Lat", value=float(st.session_state["end_coords"][0]), format="%.5f", key="man_end_lat")
-                with rc4:
-                    e_lon = st.number_input("End Lon", value=float(st.session_state["end_coords"][1]), format="%.5f", key="man_end_lon")
-                st.session_state["end_coords"] = (e_lat, e_lon)
+            st.selectbox(
+                "End Location (Destination)",
+                options=landmark_options_end,
+                index=end_idx,
+                key="widget_end_select",
+                on_change=on_end_landmark_change,
+            )
 
-            # Execute Reroute Algorithm
+            st.markdown(
+                f"<div style='font-size:0.8rem; color:#FF1744; margin-bottom:8px;'>Destination Coordinates: <code>{st.session_state['end_lat']:.5f}, {st.session_state['end_lon']:.5f}</code></div>",
+                unsafe_allow_html=True,
+            )
+
+            # 5. Execute Reroute Algorithm
             if st.button("Compute Safer Route", key="btn_compute_safe_route", use_container_width=True):
                 with st.spinner("Analyzing candidate routes and evaluating urban risk grid..."):
                     route_result = get_reroute(
-                        start=st.session_state["start_coords"],
-                        end=st.session_state["end_coords"],
+                        start=(st.session_state["start_lat"], st.session_state["start_lon"]),
+                        end=(st.session_state["end_lat"], st.session_state["end_lon"]),
                         time=st.session_state["time_of_day"],
                     )
                     st.session_state["calculated_route"] = route_result
@@ -928,9 +1000,11 @@ with tab_map:
                             <span class="{badge_class}">[{r_band.upper()} RISK]</span>
                         </div>
                         <div style="margin-top: 8px; font-size: 0.88rem; color: #F1F5F9; line-height: 1.6;">
+                            • <strong>Start</strong>: {st.session_state['start_choice']}<br>
+                            • <strong>Destination</strong>: {st.session_state['end_choice']}<br>
                             • <strong>Candidate Paths Evaluated</strong>: {r.get('compared_routes', 5)} paths<br>
                             • <strong>Average Risk Score</strong>: <span style="color:{r_color}; font-weight:800; font-size: 1rem;">{r.get('average_risk', 0.0)} / 100</span><br>
-                            • <strong>Route Visualization</strong>: Rendered in solid green line on the map
+                            • <strong>Route Tracing</strong>: Rendered in solid green line on the map
                         </div>
                     </div>
                     """,
