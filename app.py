@@ -63,11 +63,11 @@ st.set_page_config(
 # ============================================================
 CITY_CENTER = [20.2961, 85.8245]  # Bhubaneswar Center
 
-# High-contrast solid colors for guaranteed visibility
+# Ultra-vibrant solid colors for guaranteed high-visibility across all screens
 BAND_COLORS = {
-    "low": "#00E676",     # High-visibility Emerald Green (Low Risk)
-    "medium": "#FFB300",  # Neon Solar Amber (Medium Risk)
-    "high": "#FF1744",    # Neon Crimson Ruby (High Risk)
+    "low": "#00FF66",     # Radiant Neon Green (Low Risk / Safe Zone)
+    "medium": "#FFB300",  # Radiant Solar Amber (Moderate Risk / Caution)
+    "high": "#FF1744",    # Radiant Crimson Ruby (Elevated Risk / Alert)
 }
 
 BAND_LABELS = {
@@ -101,73 +101,116 @@ POPULAR_LANDMARKS = {
 }
 
 # ============================================================
-# 3. CUSTOM CYBERPUNK SOFT-GLAM STYLING (CSS - ZERO EMOJIS)
+# 3. HIGH-LEGIBILITY & ANTI-DIMMING STYLING (CSS)
 # ============================================================
 st.markdown(
     """
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap');
 
     :root {
         --bg-obsidian: #080914;
-        --bg-card: rgba(18, 20, 42, 0.85);
+        --bg-card: rgba(18, 20, 42, 0.95);
         --accent-magenta: #FF2A85;
         --accent-rose: #FFB8D9;
         --accent-cyan: #00F0FF;
         --accent-purple: #9B51E0;
-        --safe-green: #00E676;
+        --safe-green: #00FF66;
         --warn-amber: #FFB300;
         --danger-ruby: #FF1744;
         --text-primary: #FFFFFF;
-        --text-secondary: #D4C9E6;
-        --border-glass: rgba(255, 42, 133, 0.25);
+        --text-secondary: #F1F5F9;
+        --border-glass: rgba(255, 42, 133, 0.35);
     }
 
-    /* Overall Application Background */
+    /* PREVENT ALL STREAMLIT DIMMING / LIGHTENING ON CLICK / RERUN */
+    div[data-testid="stAppViewContainer"],
+    div[data-testid="stVerticalBlock"],
+    div[data-testid="stElementContainer"],
+    div.element-container,
+    div.stBlock,
     .stApp {
-        background: radial-gradient(circle at 10% 20%, rgba(255, 42, 133, 0.08) 0%, transparent 40%),
-                    radial-gradient(circle at 90% 80%, rgba(155, 81, 224, 0.1) 0%, transparent 40%),
+        opacity: 1 !important;
+        filter: none !important;
+        transition: none !important;
+    }
+
+    /* Base App Typography and Background */
+    .stApp {
+        background: radial-gradient(circle at 10% 20%, rgba(255, 42, 133, 0.12) 0%, transparent 40%),
+                    radial-gradient(circle at 90% 80%, rgba(155, 81, 224, 0.15) 0%, transparent 40%),
                     #080914 !important;
         font-family: 'Outfit', sans-serif !important;
         color: #FFFFFF !important;
     }
 
-    /* Headers and Titles */
+    /* Universal High-Contrast Text */
+    p, span, label, div, [data-testid="stMarkdownContainer"] p, [data-testid="stMarkdownContainer"] li {
+        color: #F8FAFC !important;
+        font-size: 0.95rem;
+    }
+
+    /* Captions Override - Always Bright & Readable */
+    .stCaption, [data-testid="stCaptionContainer"], .stCaption p {
+        color: #E2E8F0 !important;
+        font-size: 0.92rem !important;
+        font-weight: 500 !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Headings */
     h1, h2, h3, h4, h5, h6 {
         font-family: 'Space Grotesk', sans-serif !important;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
         color: #FFFFFF !important;
+        font-weight: 700 !important;
     }
 
     .glam-title {
         font-family: 'Syne', sans-serif;
         font-weight: 800;
-        font-size: 2.2rem;
-        background: linear-gradient(135deg, #FFFFFF 0%, #FFB8D9 45%, #FF2A85 100%);
+        font-size: 2.3rem;
+        background: linear-gradient(135deg, #FFFFFF 0%, #FFB8D9 40%, #FF2A85 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         letter-spacing: 0.02em;
-        margin-bottom: 0.1rem;
+        margin-bottom: 0.2rem;
     }
 
     .glam-subtitle {
         font-family: 'Outfit', sans-serif;
-        font-weight: 500;
-        color: #C8BEDE;
-        font-size: 0.95rem;
-        letter-spacing: 0.06em;
+        font-weight: 600;
+        color: #FFD1E6 !important;
+        font-size: 1.02rem;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
-        margin-bottom: 1rem;
+        margin-bottom: 1.1rem;
     }
 
     /* Surface Cards */
     .glam-card {
-        background: rgba(18, 20, 42, 0.85);
-        border: 1px solid rgba(255, 42, 133, 0.25);
+        background: rgba(18, 20, 42, 0.95);
+        border: 1px solid rgba(255, 42, 133, 0.35);
         border-radius: 14px;
-        padding: 1.2rem;
-        box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.5);
-        margin-bottom: 1rem;
+        padding: 1.3rem;
+        box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.6);
+        margin-bottom: 1.1rem;
+    }
+
+    /* Section Subheaders */
+    .section-head {
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 700;
+        font-size: 1.15rem;
+        color: #FFFFFF !important;
+        margin-bottom: 4px;
+    }
+
+    .section-desc {
+        color: #E2E8F0 !important;
+        font-size: 0.92rem;
+        line-height: 1.5;
+        margin-bottom: 12px;
     }
 
     /* Status Badges */
@@ -175,150 +218,163 @@ st.markdown(
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        background: rgba(0, 230, 118, 0.12);
-        border: 1px solid rgba(0, 230, 118, 0.4);
-        color: #00E676;
-        padding: 0.3rem 0.8rem;
+        background: rgba(0, 255, 102, 0.16);
+        border: 1px solid #00FF66;
+        color: #00FF66;
+        padding: 0.35rem 0.85rem;
         border-radius: 6px;
-        font-size: 0.76rem;
-        font-weight: 700;
+        font-size: 0.8rem;
+        font-weight: 800;
         letter-spacing: 0.08em;
         text-transform: uppercase;
     }
 
     .live-pulse {
-        width: 8px;
-        height: 8px;
-        background-color: #00E676;
+        width: 9px;
+        height: 9px;
+        background-color: #00FF66;
         border-radius: 50%;
-        box-shadow: 0 0 8px #00E676;
+        box-shadow: 0 0 10px #00FF66;
         animation: pulse 1.6s infinite;
     }
 
     @keyframes pulse {
         0% { transform: scale(0.95); opacity: 0.7; }
-        50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #00E676; }
+        50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 14px #00FF66; }
         100% { transform: scale(0.95); opacity: 0.7; }
     }
 
-    /* Primary Interactive Buttons */
+    /* Interactive Buttons */
     div.stButton > button {
         background: linear-gradient(135deg, #FF2A85 0%, #B71C5A 100%) !important;
         color: #FFFFFF !important;
         font-family: 'Space Grotesk', sans-serif !important;
-        font-weight: 600 !important;
-        border: 1px solid rgba(255, 184, 217, 0.3) !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+        border: 1px solid rgba(255, 184, 217, 0.4) !important;
         border-radius: 10px !important;
-        padding: 0.5rem 1.2rem !important;
-        box-shadow: 0 4px 16px rgba(255, 42, 133, 0.35) !important;
+        padding: 0.55rem 1.2rem !important;
+        box-shadow: 0 4px 18px rgba(255, 42, 133, 0.4) !important;
         transition: all 0.2s ease-in-out !important;
         width: 100%;
     }
     div.stButton > button:hover {
         background: linear-gradient(135deg, #FF4598 0%, #D1236E 100%) !important;
-        box-shadow: 0 6px 22px rgba(255, 42, 133, 0.55) !important;
+        box-shadow: 0 6px 24px rgba(255, 42, 133, 0.65) !important;
         transform: translateY(-1px);
+        border-color: #FFFFFF !important;
     }
 
     /* Red Action Button */
     .sos-btn div.stButton > button {
         background: linear-gradient(135deg, #FF1744 0%, #B3002D 100%) !important;
-        box-shadow: 0 4px 20px rgba(255, 23, 68, 0.5) !important;
-        border: 1px solid rgba(255, 100, 130, 0.5) !important;
-        font-weight: 700 !important;
-        font-size: 0.95rem !important;
+        box-shadow: 0 4px 22px rgba(255, 23, 68, 0.6) !important;
+        border: 1px solid rgba(255, 100, 130, 0.6) !important;
+        font-weight: 800 !important;
+        font-size: 1rem !important;
     }
 
     /* Metric Containers */
     [data-testid="stMetricValue"] {
         font-family: 'Space Grotesk', sans-serif !important;
-        font-weight: 700 !important;
+        font-weight: 800 !important;
         color: #FFB8D9 !important;
+        font-size: 1.6rem !important;
     }
-    [data-testid="stMetricLabel"] {
+    [data-testid="stMetricLabel"] p, [data-testid="stMetricLabel"] {
         font-family: 'Outfit', sans-serif !important;
-        color: #A99EBE !important;
+        color: #E2E8F0 !important;
         text-transform: uppercase;
-        font-size: 0.78rem !important;
-        letter-spacing: 0.05em;
+        font-size: 0.82rem !important;
+        font-weight: 700 !important;
+        letter-spacing: 0.06em;
     }
 
-    /* Form Fields */
+    /* Form Fields and Labels */
+    div[data-testid="stWidgetLabel"] p,
+    div[data-testid="stWidgetLabel"] label,
+    .stRadio label, .stSelectbox label, .stNumberInput label, .stTextInput label {
+        color: #FFFFFF !important;
+        font-weight: 700 !important;
+        font-size: 0.95rem !important;
+        margin-bottom: 4px !important;
+    }
+
     div[data-baseweb="select"] > div,
     div[data-baseweb="input"] > div {
         background-color: rgba(14, 16, 36, 0.95) !important;
-        border-color: rgba(255, 42, 133, 0.3) !important;
+        border: 1px solid rgba(255, 42, 133, 0.4) !important;
         border-radius: 8px !important;
         color: #FFFFFF !important;
     }
 
-    /* Workspace Tabs */
+    /* Tabs Styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 6px;
-        background-color: rgba(15, 17, 36, 0.8);
+        background-color: rgba(15, 17, 36, 0.85);
         padding: 6px;
         border-radius: 12px;
-        border: 1px solid rgba(255, 42, 133, 0.2);
+        border: 1px solid rgba(255, 42, 133, 0.3);
     }
     .stTabs [data-baseweb="tab"] {
         background-color: transparent;
         border-radius: 8px;
-        color: #A69DBB;
+        color: #CBD5E1;
         font-family: 'Space Grotesk', sans-serif;
-        font-weight: 600;
-        font-size: 0.88rem;
-        padding: 8px 16px;
+        font-weight: 700;
+        font-size: 0.92rem;
+        padding: 9px 18px;
     }
     .stTabs [aria-selected="true"] {
-        background: linear-gradient(135deg, rgba(255, 42, 133, 0.35) 0%, rgba(155, 81, 224, 0.35) 100%) !important;
+        background: linear-gradient(135deg, rgba(255, 42, 133, 0.4) 0%, rgba(155, 81, 224, 0.4) 100%) !important;
         color: #FFFFFF !important;
-        font-weight: 700 !important;
-        border: 1px solid rgba(255, 42, 133, 0.6) !important;
-        box-shadow: 0 0 12px rgba(255, 42, 133, 0.3);
+        font-weight: 800 !important;
+        border: 1px solid rgba(255, 42, 133, 0.7) !important;
+        box-shadow: 0 0 14px rgba(255, 42, 133, 0.35);
     }
 
     /* Sidebar Navigation */
     section[data-testid="stSidebar"] {
         background-color: #0B0C1E !important;
-        border-right: 1px solid rgba(255, 42, 133, 0.2) !important;
+        border-right: 1px solid rgba(255, 42, 133, 0.25) !important;
     }
 
     /* Risk Text Badges */
     .badge-low {
-        background: rgba(0, 230, 118, 0.18);
-        color: #00E676;
-        border: 1px solid #00E676;
-        padding: 3px 8px;
-        border-radius: 5px;
-        font-weight: 700;
-        font-size: 0.8rem;
+        background: rgba(0, 255, 102, 0.25);
+        color: #00FF66;
+        border: 1px solid #00FF66;
+        padding: 4px 9px;
+        border-radius: 6px;
+        font-weight: 800;
+        font-size: 0.82rem;
         display: inline-block;
     }
     .badge-medium {
-        background: rgba(255, 179, 0, 0.18);
+        background: rgba(255, 179, 0, 0.25);
         color: #FFB300;
         border: 1px solid #FFB300;
-        padding: 3px 8px;
-        border-radius: 5px;
-        font-weight: 700;
-        font-size: 0.8rem;
+        padding: 4px 9px;
+        border-radius: 6px;
+        font-weight: 800;
+        font-size: 0.82rem;
         display: inline-block;
     }
     .badge-high {
-        background: rgba(255, 23, 68, 0.2);
+        background: rgba(255, 23, 68, 0.28);
         color: #FF1744;
         border: 1px solid #FF1744;
-        padding: 3px 8px;
-        border-radius: 5px;
-        font-weight: 700;
-        font-size: 0.8rem;
+        padding: 4px 9px;
+        border-radius: 6px;
+        font-weight: 800;
+        font-size: 0.82rem;
         display: inline-block;
     }
 
-    /* Helpline Container */
+    /* Helpline Quick Dial Cards */
     .helpline-box {
-        background: rgba(20, 24, 50, 0.9);
-        border: 1px solid rgba(255, 184, 217, 0.2);
+        background: rgba(20, 24, 50, 0.95);
+        border: 1px solid rgba(255, 184, 217, 0.3);
         border-radius: 10px;
         padding: 10px;
         text-align: center;
@@ -326,26 +382,33 @@ st.markdown(
     }
     .helpline-box:hover {
         border-color: #FF2A85;
-        box-shadow: 0 0 12px rgba(255, 42, 133, 0.35);
+        box-shadow: 0 0 14px rgba(255, 42, 133, 0.4);
     }
     .helpline-num {
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 1.25rem;
+        font-size: 1.3rem;
         font-weight: 800;
         color: #FFB8D9;
     }
     .helpline-desc {
-        font-size: 0.7rem;
-        color: #A99EBE;
+        font-size: 0.72rem;
+        color: #E2E8F0;
         text-transform: uppercase;
-        font-weight: 600;
+        font-weight: 700;
     }
 
-    /* Fixed Map Canvas Background */
+    /* Map Iframe Styling - Locked Dark Theme */
     iframe {
-        background-color: #0c0e1e !important;
+        background-color: #080914 !important;
+        background: #080914 !important;
+        color-scheme: dark !important;
         border-radius: 12px;
-        border: 1px solid rgba(255, 42, 133, 0.25) !important;
+        border: 1px solid rgba(255, 42, 133, 0.3) !important;
+    }
+
+    .folium-map, .leaflet-container {
+        background-color: #080914 !important;
+        background: #080914 !important;
     }
     </style>
     """,
@@ -396,61 +459,52 @@ def get_current_time_bucket():
 
 def generate_leaflet_map(risk_grid, route_data=None, selected_latlon=None):
     """
-    Build Folium map with high-visibility markers and solid contrast.
-    Low Risk = Emerald Green, Medium Risk = Amber, High Risk = Crimson Red.
-    Maintains solid opacity without fading or lightening on user interaction.
+    Build Folium map with Canvas hardware acceleration (prefer_canvas=True).
+    Guarantees that green dots (low risk), amber dots, and red dots are rendered
+    with solid contrast, without flickering or dimming on click.
     """
     m = folium.Map(
         location=CITY_CENTER,
         zoom_start=13,
         tiles="CartoDB dark_matter",
+        prefer_canvas=True,
         control_scale=True,
     )
-
-    # 1. Stratified Grid Sampling to guarantee clear presence of ALL risk bands
-    # Collect all low risk, medium risk, and high risk segments
-    low_cells = [c for c in risk_grid if c.get("band") == "low"]
-    med_cells = [c for c in risk_grid if c.get("band") == "medium"]
-    high_cells = [c for c in risk_grid if c.get("band") == "high"]
-
-    # Keep all green points and sample medium/high to maintain 60 FPS and crisp visibility
-    display_grid = low_cells + med_cells[::2] + high_cells[::2]
 
     # Feature Group for Risk Points
     grid_group = folium.FeatureGroup(name="SafeGrid Monitored Segments", show=True)
 
-    for cell in display_grid:
+    for cell in risk_grid:
         band = cell.get("band", "medium")
         color = BAND_COLORS.get(band, "#FFB300")
         score = cell.get("score", 0.0)
         landmark = cell.get("landmark", f"Segment {cell.get('segment_id', '')}")
         zone = cell.get("zone_type", "Urban Area").replace("_", " ").title()
 
-        # Solid HTML card with dark background
         popup_html = f"""
         <div style="font-family: 'Outfit', sans-serif; background: #0E1022; color: #FFFFFF; padding: 10px; border-radius: 8px; border: 1px solid {color}; width: 210px;">
-            <div style="font-size: 12px; font-weight: 700; color: #FFB8D9; margin-bottom: 2px;">{landmark}</div>
-            <div style="font-size: 10px; color: #8E88A8; margin-bottom: 6px;">Zone: {zone}</div>
+            <div style="font-size: 13px; font-weight: 700; color: #FFB8D9; margin-bottom: 2px;">{landmark}</div>
+            <div style="font-size: 11px; color: #CBD5E1; margin-bottom: 6px;">Zone: {zone}</div>
             <div style="background: {color}25; border: 1px solid {color}; color: {color}; font-weight: 800; font-size: 11px; padding: 3px 6px; border-radius: 4px; text-align: center; text-transform: uppercase;">
                 [{band.upper()} RISK]
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #D4C9E6; border-top: 1px solid #252848; margin-top: 6px; padding-top: 4px;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #F1F5F9; border-top: 1px solid #252848; margin-top: 6px; padding-top: 4px;">
                 <span>AI Risk Score:</span>
-                <strong style="color: {color};">{score} / 100</strong>
+                <strong style="color: {color}; font-size: 12px;">{score} / 100</strong>
             </div>
         </div>
         """
 
         tooltip_text = f"[{band.upper()} RISK] {landmark} ({score}/100)"
 
-        # Solid CircleMarker: high fill_opacity and solid border to prevent lightening
+        # Solid CircleMarker on Canvas: no fading on interaction
         folium.CircleMarker(
             location=[cell["lat"], cell["lon"]],
-            radius=7.5,
+            radius=8.0,
             color=color,
             fill=True,
             fill_color=color,
-            fill_opacity=0.90,
+            fill_opacity=0.95,
             opacity=1.0,
             weight=1.5,
             tooltip=tooltip_text,
@@ -464,7 +518,7 @@ def generate_leaflet_map(risk_grid, route_data=None, selected_latlon=None):
     for name, coords in POPULAR_LANDMARKS.items():
         folium.CircleMarker(
             location=coords,
-            radius=4.5,
+            radius=5.5,
             color="#FF2A85",
             fill=True,
             fill_color="#FFFFFF",
@@ -483,14 +537,13 @@ def generate_leaflet_map(risk_grid, route_data=None, selected_latlon=None):
             icon=folium.Icon(color="purple", icon="info-sign"),
         ).add_to(m)
 
-    # 4. Computed AI Safer Route (Solid Emerald Polyline)
+    # 4. Computed AI Safer Route (Solid Non-Fading Emerald Polyline)
     if route_data and "route" in route_data:
         coords = [(p["lat"], p["lon"]) for p in route_data["route"]]
         if coords:
-            # Solid non-fading PolyLine
             folium.PolyLine(
                 coords,
-                color="#00E676",
+                color="#00FF66",
                 weight=6,
                 opacity=1.0,
                 tooltip=f"Safe Route - Band: {route_data.get('risk_band', 'LOW').upper()} (Score: {route_data.get('average_risk', 0.0)})",
@@ -517,10 +570,10 @@ def generate_leaflet_map(risk_grid, route_data=None, selected_latlon=None):
 with st.sidebar:
     st.markdown(
         """
-        <div style="text-align: center; padding: 0.5rem 0 1rem 0;">
-            <div style="font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: #FFFFFF;">SAFEGRID</div>
-            <div style="font-size: 0.72rem; color: #FFB8D9; letter-spacing: 0.1em; text-transform: uppercase;">Code Coven | Infinity Hacks 2026</div>
-            <div style="margin-top: 8px;">
+        <div style="text-align: center; padding: 0.6rem 0 1.1rem 0;">
+            <div style="font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: #FFFFFF; letter-spacing: 0.02em;">SAFEGRID</div>
+            <div style="font-size: 0.88rem; font-weight: 700; color: #FFB8D9; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px;">Code Coven | Infinity Hacks 2026</div>
+            <div style="margin-top: 10px;">
                 <span class="live-badge"><span class="live-pulse"></span> SYSTEM ACTIVE | BHUBANESWAR</span>
             </div>
         </div>
@@ -531,8 +584,9 @@ with st.sidebar:
     st.markdown("---")
 
     # Time-of-Day Matrix
-    st.markdown("### Time-of-Day Matrix")
-    st.caption("City risk profiles adjust dynamically with lighting and crowd density changes across hours.")
+    st.markdown("<div class='section-head'>Time-of-Day Matrix</div>", unsafe_allow_html=True)
+    st.markdown("<div style='color: #E2E8F0; font-size: 0.88rem; line-height: 1.4; margin-bottom: 8px;'>City risk profiles adjust dynamically with lighting and crowd density changes across hours.</div>", unsafe_allow_html=True)
+    
     time_options = ["morning", "afternoon", "evening", "night"]
     current_detected = get_current_time_bucket()
 
@@ -559,7 +613,7 @@ with st.sidebar:
     st.markdown("---")
 
     # Emergency Hotlines
-    st.markdown("### Emergency Hotlines")
+    st.markdown("<div class='section-head'>Emergency Hotlines</div>", unsafe_allow_html=True)
     h_col1, h_col2 = st.columns(2)
     with h_col1:
         st.markdown(
@@ -614,7 +668,7 @@ with st.sidebar:
 
     st.markdown("---")
     b_info = backend_info()
-    st.caption(f"Monitored Segments: **{b_info['segments']}** | Engine: **XGBoost AI**")
+    st.markdown(f"<div style='color:#E2E8F0; font-size:0.85rem;'>Monitored Segments: <strong style='color:#FFFFFF;'>{b_info['segments']}</strong> | Engine: <strong style='color:#00FF66;'>XGBoost AI</strong></div>", unsafe_allow_html=True)
 
 # ============================================================
 # 7. MAIN APPLICATION HEADER
@@ -630,12 +684,12 @@ with header_col1:
 
 with header_col2:
     current_bucket = st.session_state["time_of_day"]
-    bucket_badge_color = "#FF1744" if current_bucket == "night" else ("#FFB300" if current_bucket == "evening" else "#00E676")
+    bucket_badge_color = "#FF1744" if current_bucket == "night" else ("#FFB300" if current_bucket == "evening" else "#00FF66")
     st.markdown(
         f"""
         <div style="text-align: right; padding-top: 0.4rem;">
-            <div style="font-size: 0.78rem; color: #8E88A8;">ACTIVE TIME BUCKET</div>
-            <div style="font-family: 'Space Grotesk'; font-size: 1.35rem; font-weight: 700; color: {bucket_badge_color}; text-transform: uppercase;">
+            <div style="font-size: 0.82rem; font-weight: 700; color: #CBD5E1;">ACTIVE TIME BUCKET</div>
+            <div style="font-family: 'Space Grotesk'; font-size: 1.4rem; font-weight: 800; color: {bucket_badge_color}; text-transform: uppercase;">
                 {current_bucket} MODE
             </div>
         </div>
@@ -680,7 +734,7 @@ with tab_map:
     with m_col4:
         st.metric("Elevated Risk (Alert)", f"{high_risk_count} ({high_risk_count/max(1,total_points)*100:.0f}%)")
 
-    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
 
     # Layout: Map (Left 64%) vs Command Deck (Right 36%)
     map_col, panel_col = st.columns([64, 36])
@@ -689,9 +743,9 @@ with tab_map:
         # High-contrast legend bar
         st.markdown(
             """
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; background: rgba(18,20,42,0.9); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,42,133,0.2);">
-                <span style="font-weight: 700; font-size: 0.88rem; color: #FFFFFF;">Bhubaneswar Live Risk Heatmap</span>
-                <span style="font-size: 0.8rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; background: rgba(18,20,42,0.95); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,42,133,0.3);">
+                <span style="font-weight: 800; font-size: 0.92rem; color: #FFFFFF;">Bhubaneswar Live Risk Heatmap</span>
+                <span style="font-size: 0.82rem;">
                     <span class="badge-low">GREEN = LOW RISK</span> &nbsp;
                     <span class="badge-medium">AMBER = MEDIUM RISK</span> &nbsp;
                     <span class="badge-high">RED = HIGH RISK</span>
@@ -701,7 +755,7 @@ with tab_map:
             unsafe_allow_html=True,
         )
 
-        # Generate Folium Map
+        # Generate Folium Map with prefer_canvas=True (no flickering/lightening)
         current_map = generate_leaflet_map(
             risk_grid=risk_grid,
             route_data=st.session_state.get("calculated_route"),
@@ -733,7 +787,7 @@ with tab_map:
                 st.session_state["end_coords"] = (clicked_lat, clicked_lng)
                 st.session_state["end_name"] = f"Map Pin ({clicked_lat:.4f}, {clicked_lng:.4f})"
 
-        st.caption("Tip: Select 'Pick on Map' mode on the right to set Start or Destination by clicking anywhere on the map.")
+        st.markdown("<div style='color: #E2E8F0; font-size: 0.85rem; margin-top: 4px;'>Tip: Select 'Pick on Map' mode on the right to set Start or Destination by clicking anywhere on the map.</div>", unsafe_allow_html=True)
 
     # ------------------------------------------------------------
     # RIGHT COMMAND DECK: USER-FRIENDLY ROUTING AND REPORTING
@@ -749,8 +803,8 @@ with tab_map:
         # SUB-TAB 1: USER-FRIENDLY AI SAFE ROUTE GENERATOR
         # ------------------------------------------------------------
         with deck_tab_route:
-            st.markdown("#### AI Safe Route Navigator")
-            st.caption("Calculates safer alternative paths avoiding unlit streets and high incident zones.")
+            st.markdown("<div class='section-head'>AI Safe Route Navigator</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-desc'>Calculates safer alternative paths avoiding unlit streets and high incident zones.</div>", unsafe_allow_html=True)
 
             route_input_method = st.radio(
                 "Input Mode",
@@ -801,7 +855,7 @@ with tab_map:
             elif route_input_method == "Pick on Map":
                 st.markdown(
                     """
-                    <div style="background: rgba(18,20,42,0.9); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,230,118,0.3); font-size: 0.85rem;">
+                    <div style="background: rgba(18,20,42,0.95); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,102,0.4); font-size: 0.88rem; color: #FFFFFF;">
                         Select which point to set, then click anywhere on the map:
                     </div>
                     """,
@@ -821,9 +875,9 @@ with tab_map:
 
                 st.markdown(
                     f"""
-                    <div style="margin-top: 8px; font-size: 0.82rem; color: #D4C9E6;">
-                        • <strong>Origin:</strong> {st.session_state.get('start_name', 'Not set')} <code>({st.session_state['start_coords'][0]:.4f}, {st.session_state['start_coords'][1]:.4f})</code><br>
-                        • <strong>Destination:</strong> {st.session_state.get('end_name', 'Not set')} <code>({st.session_state['end_coords'][0]:.4f}, {st.session_state['end_coords'][1]:.4f})</code>
+                    <div style="margin-top: 8px; font-size: 0.85rem; color: #FFFFFF; background: rgba(14,16,36,0.9); padding: 8px; border-radius: 6px;">
+                        • <strong>Origin:</strong> <span style="color:#00FF66;">{st.session_state.get('start_name', 'Not set')}</span> <code>({st.session_state['start_coords'][0]:.4f}, {st.session_state['start_coords'][1]:.4f})</code><br>
+                        • <strong>Destination:</strong> <span style="color:#FF1744;">{st.session_state.get('end_name', 'Not set')}</span> <code>({st.session_state['end_coords'][0]:.4f}, {st.session_state['end_coords'][1]:.4f})</code>
                     </div>
                     """,
                     unsafe_allow_html=True,
@@ -831,7 +885,7 @@ with tab_map:
 
             # MODE C: Enter Coordinates
             else:
-                st.markdown("<div style='font-size:0.8rem; font-weight:700; color:#00E676; margin-top:6px;'>ORIGIN COORDINATES</div>", unsafe_allow_html=True)
+                st.markdown("<div style='font-size:0.85rem; font-weight:800; color:#00FF66; margin-top:6px;'>ORIGIN COORDINATES</div>", unsafe_allow_html=True)
                 rc1, rc2 = st.columns(2)
                 with rc1:
                     s_lat = st.number_input("Start Lat", value=float(st.session_state["start_coords"][0]), format="%.5f", key="man_start_lat")
@@ -839,7 +893,7 @@ with tab_map:
                     s_lon = st.number_input("Start Lon", value=float(st.session_state["start_coords"][1]), format="%.5f", key="man_start_lon")
                 st.session_state["start_coords"] = (s_lat, s_lon)
 
-                st.markdown("<div style='font-size:0.8rem; font-weight:700; color:#FF1744; margin-top:4px;'>DESTINATION COORDINATES</div>", unsafe_allow_html=True)
+                st.markdown("<div style='font-size:0.85rem; font-weight:800; color:#FF1744; margin-top:4px;'>DESTINATION COORDINATES</div>", unsafe_allow_html=True)
                 rc3, rc4 = st.columns(2)
                 with rc3:
                     e_lat = st.number_input("End Lat", value=float(st.session_state["end_coords"][0]), format="%.5f", key="man_end_lat")
@@ -862,20 +916,20 @@ with tab_map:
             if st.session_state.get("calculated_route"):
                 r = st.session_state["calculated_route"]
                 r_band = r.get("risk_band", "low")
-                r_color = BAND_COLORS.get(r_band, "#00E676")
+                r_color = BAND_COLORS.get(r_band, "#00FF66")
                 badge_class = f"badge-{r_band}"
 
                 st.markdown("---")
                 st.markdown(
                     f"""
-                    <div style="background: rgba(14, 17, 38, 0.9); border: 1px solid {r_color}; border-radius: 10px; padding: 10px; margin-top: 6px;">
+                    <div style="background: rgba(14, 17, 38, 0.95); border: 1px solid {r_color}; border-radius: 10px; padding: 12px; margin-top: 6px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-weight: 700; color: #FFFFFF;">Safer Route Found:</span>
+                            <span style="font-weight: 800; color: #FFFFFF; font-size: 0.95rem;">Safer Route Found:</span>
                             <span class="{badge_class}">[{r_band.upper()} RISK]</span>
                         </div>
-                        <div style="margin-top: 6px; font-size: 0.82rem; color: #D4C9E6;">
+                        <div style="margin-top: 8px; font-size: 0.88rem; color: #F1F5F9; line-height: 1.6;">
                             • <strong>Candidate Paths Evaluated</strong>: {r.get('compared_routes', 5)} paths<br>
-                            • <strong>Average Risk Score</strong>: <span style="color:{r_color}; font-weight:700;">{r.get('average_risk', 0.0)} / 100</span><br>
+                            • <strong>Average Risk Score</strong>: <span style="color:{r_color}; font-weight:800; font-size: 1rem;">{r.get('average_risk', 0.0)} / 100</span><br>
                             • <strong>Route Visualization</strong>: Rendered in solid green line on the map
                         </div>
                     </div>
@@ -891,8 +945,8 @@ with tab_map:
         # SUB-TAB 2: "FELT UNSAFE HERE" INSTANT REPORTER
         # ------------------------------------------------------------
         with deck_tab_report:
-            st.markdown("#### Felt Unsafe Here?")
-            st.caption("Submit anonymous crowdsourced reports. Every report updates SafeGrid's risk grid instantly.")
+            st.markdown("<div class='section-head'>Felt Unsafe Here?</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-desc'>Submit anonymous crowdsourced reports. Every report updates SafeGrid's risk grid instantly.</div>", unsafe_allow_html=True)
 
             current_sel = st.session_state.get("selected_point", CITY_CENTER)
 
@@ -936,9 +990,9 @@ with tab_map:
                 last_rep = st.session_state["report_success_toast"]
                 st.markdown(
                     f"""
-                    <div style="background: rgba(0, 230, 118, 0.1); border: 1px solid #00E676; border-radius: 8px; padding: 8px; margin-top: 8px; font-size: 0.8rem;">
-                        <strong>ID:</strong> <code>{last_rep.get('report_id')}</code> | <strong>Segment:</strong> <code>{last_rep.get('segment_id')}</code><br>
-                        <span style="color:#00E676;">Thank you for protecting our community.</span>
+                    <div style="background: rgba(0, 255, 102, 0.15); border: 1px solid #00FF66; border-radius: 8px; padding: 10px; margin-top: 8px; font-size: 0.85rem; color: #FFFFFF;">
+                        <strong>Transmission ID:</strong> <code>{last_rep.get('report_id')}</code> | <strong>Segment:</strong> <code>{last_rep.get('segment_id')}</code><br>
+                        <span style="color:#00FF66; font-weight:700;">Thank you for protecting our community.</span>
                     </div>
                     """,
                     unsafe_allow_html=True,
@@ -948,8 +1002,8 @@ with tab_map:
         # SUB-TAB 3: SPOT INSPECTOR
         # ------------------------------------------------------------
         with deck_tab_spot:
-            st.markdown("#### Spot Safety Inspector")
-            st.caption("Inspect live AI safety predictions for any coordinate or landmark in Bhubaneswar.")
+            st.markdown("<div class='section-head'>Spot Safety Inspector</div>", unsafe_allow_html=True)
+            st.markdown("<div class='section-desc'>Inspect live AI safety predictions for any coordinate or landmark in Bhubaneswar.</div>", unsafe_allow_html=True)
 
             insp_landmark = st.selectbox(
                 "Choose Landmark or Custom Point",
@@ -972,13 +1026,13 @@ with tab_map:
                 st.markdown(
                     f"""
                     <div style="background: rgba(18, 22, 48, 0.95); border: 1px solid {s_color}; border-radius: 10px; padding: 12px; margin-top: 10px;">
-                        <div style="font-size: 0.75rem; color: #8E88A8;">PREDICTED RISK BAND</div>
-                        <div style="font-size: 1.3rem; font-weight: 800; color: {s_color}; font-family: 'Space Grotesk';">
+                        <div style="font-size: 0.8rem; font-weight: 700; color: #CBD5E1;">PREDICTED RISK BAND</div>
+                        <div style="font-size: 1.35rem; font-weight: 800; color: {s_color}; font-family: 'Space Grotesk'; margin: 4px 0;">
                             [{s_band.upper()} RISK]
                         </div>
-                        <div style="font-size: 0.85rem; color: #D4C9E6; margin-top: 6px;">
+                        <div style="font-size: 0.88rem; color: #FFFFFF; line-height: 1.6;">
                             • <strong>Nearest Segment ID</strong>: <code>{spot_res.get('segment_id')}</code><br>
-                            • <strong>AI Risk Score</strong>: <span style="color:{s_color}; font-weight:700;">{s_score} / 100</span><br>
+                            • <strong>AI Risk Score</strong>: <span style="color:{s_color}; font-weight:800; font-size:1rem;">{s_score} / 100</span><br>
                             • <strong>Time Bucket</strong>: {spot_res.get('time_bucket', '').upper()}
                         </div>
                     </div>
@@ -999,8 +1053,8 @@ with tab_sos:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#FF1744 !important;">1-Tap Emergency Broadcast</h3>
-                <p style="color:#D4C9E6; font-size:0.88rem;">
+                <h3 style="color:#FF1744 !important; font-size:1.25rem;">1-Tap Emergency Broadcast</h3>
+                <p style="color:#E2E8F0; font-size:0.92rem; line-height:1.5;">
                     Generates a formatted distress message with live GPS coordinates, Google Maps link, and current time for WhatsApp or SMS rapid broadcast to your emergency circle.
                 </p>
             </div>
@@ -1020,7 +1074,7 @@ with tab_sos:
             st.markdown(
                 f"""
                 <a href="{wa_url}" target="_blank" style="text-decoration:none;">
-                    <div style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
+                    <div style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 11px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
                         Share on WhatsApp
                     </div>
                 </a>
@@ -1032,7 +1086,7 @@ with tab_sos:
             st.markdown(
                 f"""
                 <a href="{sms_url}" style="text-decoration:none;">
-                    <div style="background: linear-gradient(135deg, #FF2A85 0%, #B71C5A 100%); color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(255, 42, 133, 0.4);">
+                    <div style="background: linear-gradient(135deg, #FF2A85 0%, #B71C5A 100%); color: white; padding: 11px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(255, 42, 133, 0.4);">
                         Send Direct SMS
                     </div>
                 </a>
@@ -1046,15 +1100,15 @@ with tab_sos:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#FFB300 !important;">High-Decibel Deterrent Siren</h3>
-                <p style="color:#D4C9E6; font-size:0.85rem;">
+                <h3 style="color:#FFB300 !important; font-size:1.25rem;">High-Decibel Deterrent Siren</h3>
+                <p style="color:#E2E8F0; font-size:0.9rem; line-height:1.5;">
                     Activate an in-browser acoustic warning pulse to attract public attention and deter potential aggressors.
                 </p>
-                <div style="text-align: center; margin-top: 10px;">
-                    <button id="sirenBtn" onclick="toggleSiren()" style="background: linear-gradient(135deg, #FFB300 0%, #FF5500 100%); border: none; color: white; padding: 10px 24px; border-radius: 999px; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 0 15px rgba(255, 179, 0, 0.4);">
+                <div style="text-align: center; margin-top: 12px;">
+                    <button id="sirenBtn" onclick="toggleSiren()" style="background: linear-gradient(135deg, #FFB300 0%, #FF5500 100%); border: none; color: white; padding: 11px 26px; border-radius: 999px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 0 16px rgba(255, 179, 0, 0.45);">
                         TOGGLE SIREN ALARM
                     </button>
-                    <div id="sirenStatus" style="margin-top: 6px; font-size: 0.78rem; color: #A99EBE;">Click to start audio frequency alarm</div>
+                    <div id="sirenStatus" style="margin-top: 8px; font-size: 0.85rem; color: #CBD5E1; font-weight:600;">Click to start audio frequency alarm</div>
                 </div>
             </div>
 
@@ -1105,7 +1159,7 @@ with tab_sos:
                     btn.innerText = "TOGGLE SIREN ALARM";
                     btn.style.background = "linear-gradient(135deg, #FFB300 0%, #FF5500 100%)";
                     status.innerText = "Siren Deactivated.";
-                    status.style.color = "#A99EBE";
+                    status.style.color = "#CBD5E1";
                 }
             }
             </script>
@@ -1118,8 +1172,8 @@ with tab_sos:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#00F0FF !important;">Fake Call Assistant</h3>
-                <p style="color:#D4C9E6; font-size:0.88rem;">
+                <h3 style="color:#00F0FF !important; font-size:1.25rem;">Fake Call Assistant</h3>
+                <p style="color:#E2E8F0; font-size:0.92rem; line-height:1.5;">
                     Need a tactical escape from an uncomfortable situation or deserted street? Trigger a simulated incoming phone call.
                 </p>
             </div>
@@ -1139,12 +1193,12 @@ with tab_sos:
         if st.session_state.get("fake_call_step") == "ringing":
             st.markdown(
                 f"""
-                <div style="background: radial-gradient(circle, rgba(255,42,133,0.2) 0%, rgba(10,12,28,0.95) 100%); border: 2px solid #FF2A85; border-radius: 14px; padding: 20px; text-align: center; box-shadow: 0 0 25px rgba(255,42,133,0.4); margin-top: 12px;">
-                    <div style="font-size: 0.8rem; color: #8E88A8; text-transform: uppercase;">Incoming SafeCall</div>
-                    <div style="font-family: 'Space Grotesk'; font-size: 1.6rem; font-weight: 800; color: #FFFFFF; margin: 4px 0;">{caller_id}</div>
-                    <div style="font-size: 0.78rem; color: #00E676;">Verified SafeLine Active</div>
-                    <div style="margin-top: 15px;">
-                        <button onclick="alert('Call Answered: Simulated dialogue playing')" style="background: #00E676; color: #000; border: none; padding: 10px 20px; border-radius: 999px; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 0 12px #00E676;">
+                <div style="background: radial-gradient(circle, rgba(255,42,133,0.25) 0%, rgba(10,12,28,0.95) 100%); border: 2px solid #FF2A85; border-radius: 14px; padding: 22px; text-align: center; box-shadow: 0 0 30px rgba(255,42,133,0.45); margin-top: 12px;">
+                    <div style="font-size: 0.85rem; color: #CBD5E1; text-transform: uppercase; font-weight:700;">Incoming SafeCall</div>
+                    <div style="font-family: 'Space Grotesk'; font-size: 1.7rem; font-weight: 800; color: #FFFFFF; margin: 6px 0;">{caller_id}</div>
+                    <div style="font-size: 0.82rem; color: #00FF66; font-weight:700;">Verified SafeLine Active</div>
+                    <div style="margin-top: 16px;">
+                        <button onclick="alert('Call Answered: Simulated dialogue playing')" style="background: #00FF66; color: #000; border: none; padding: 11px 24px; border-radius: 999px; font-weight: 800; font-size: 1rem; cursor: pointer; box-shadow: 0 0 14px #00FF66;">
                             ACCEPT CALL
                         </button>
                     </div>
@@ -1169,8 +1223,8 @@ with tab_companion:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#00E676 !important;">Safety Check-in Timer</h3>
-                <p style="color:#D4C9E6; font-size:0.88rem;">
+                <h3 style="color:#00FF66 !important; font-size:1.25rem;">Safety Check-in Timer</h3>
+                <p style="color:#E2E8F0; font-size:0.92rem; line-height:1.5;">
                     Set your expected travel duration. If you do not confirm safe arrival before the timer expires, SafeGrid prepares an automated emergency broadcast.
                 </p>
             </div>
@@ -1198,10 +1252,10 @@ with tab_companion:
         if st.session_state.get("companion_active"):
             st.markdown(
                 f"""
-                <div style="background: rgba(0, 230, 118, 0.12); border: 1px solid #00E676; border-radius: 10px; padding: 12px; margin-top: 12px; text-align: center;">
-                    <div style="font-size: 1.1rem; font-weight: 700; color: #00E676;">GUARDIAN WATCH ACTIVE</div>
-                    <div style="font-size: 0.85rem; color: #FFFFFF; margin: 3px 0;">Destination: <strong>{destination_label}</strong></div>
-                    <div style="font-size: 0.78rem; color: #A99EBE;">Window: {trip_minutes} mins | Watchdog running</div>
+                <div style="background: rgba(0, 255, 102, 0.15); border: 1px solid #00FF66; border-radius: 10px; padding: 14px; margin-top: 14px; text-align: center;">
+                    <div style="font-size: 1.15rem; font-weight: 800; color: #00FF66;">GUARDIAN WATCH ACTIVE</div>
+                    <div style="font-size: 0.9rem; color: #FFFFFF; margin: 4px 0;">Destination: <strong>{destination_label}</strong></div>
+                    <div style="font-size: 0.82rem; color: #CBD5E1; font-weight:600;">Window: {trip_minutes} mins | Automated watchdog running</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -1211,13 +1265,13 @@ with tab_companion:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#FFB8D9 !important;">Pre-Transit Safety Checklist</h3>
-                <ul style="color:#D4C9E6; font-size:0.88rem; line-height:1.8;">
-                    <li><strong>Phone Battery</strong>: Keep charged above 20%</li>
-                    <li><strong>Live Location</strong>: Share with trusted emergency contact</li>
-                    <li><strong>Situational Awareness</strong>: Keep one ear free from headphones</li>
-                    <li><strong>Well-lit Paths</strong>: Follow SafeGrid's green route guidance</li>
-                    <li><strong>Quick Access</strong>: Keep SafeGrid open in mobile browser</li>
+                <h3 style="color:#FFB8D9 !important; font-size:1.25rem;">Pre-Transit Safety Checklist</h3>
+                <ul style="color:#F1F5F9; font-size:0.92rem; line-height:1.9;">
+                    <li><strong style="color:#FFFFFF;">Phone Battery</strong>: Keep charged above 20%</li>
+                    <li><strong style="color:#FFFFFF;">Live Location</strong>: Share with trusted emergency contact</li>
+                    <li><strong style="color:#FFFFFF;">Situational Awareness</strong>: Keep one ear free from headphones</li>
+                    <li><strong style="color:#FFFFFF;">Well-lit Paths</strong>: Follow SafeGrid's green route guidance</li>
+                    <li><strong style="color:#FFFFFF;">Quick Access</strong>: Keep SafeGrid open in mobile browser</li>
                 </ul>
             </div>
             """,
@@ -1282,7 +1336,7 @@ with tab_analytics:
         st.markdown(
             """
             <div class="glam-card">
-                <h3>Risk Distribution by Time Bucket</h3>
+                <h3 style="font-size:1.2rem;">Risk Distribution by Time Bucket</h3>
             </div>
             """,
             unsafe_allow_html=True,
@@ -1307,13 +1361,13 @@ with tab_analytics:
         st.markdown(
             """
             <div class="glam-card">
-                <h3>Key Risk Influencers (XGBoost Weights)</h3>
-                <p style="color:#D4C9E6; font-size:0.88rem; line-height:1.7;">
-                    • <strong>Lighting Score and Streetlight Operational %</strong>: 38% predictive weight<br>
-                    • <strong>Historical Incidents and Annual Police Records</strong>: 26% predictive weight<br>
-                    • <strong>Crowd Volume and Density by Time-of-Day</strong>: 18% predictive weight<br>
-                    • <strong>Crowdsourced Unsafe Real-time Reports</strong>: 12% dynamic weight<br>
-                    • <strong>Urban Zone Type and Distance to Center</strong>: 6% structural weight
+                <h3 style="font-size:1.2rem;">Key Risk Influencers (XGBoost Weights)</h3>
+                <p style="color:#F1F5F9; font-size:0.92rem; line-height:1.8;">
+                    • <strong style="color:#FFFFFF;">Lighting Score and Streetlight Operational %</strong>: 38% predictive weight<br>
+                    • <strong style="color:#FFFFFF;">Historical Incidents and Annual Police Records</strong>: 26% predictive weight<br>
+                    • <strong style="color:#FFFFFF;">Crowd Volume and Density by Time-of-Day</strong>: 18% predictive weight<br>
+                    • <strong style="color:#FFFFFF;">Crowdsourced Unsafe Real-time Reports</strong>: 12% dynamic weight<br>
+                    • <strong style="color:#FFFFFF;">Urban Zone Type and Distance to Center</strong>: 6% structural weight
                 </p>
             </div>
             """,
@@ -1330,8 +1384,8 @@ with tab_about:
     st.markdown(
         """
         <div class="glam-card">
-            <h3 style="color:#FF2A85 !important;">Mission: Autonomous Safety Before Danger Strikes</h3>
-            <p style="color:#D4C9E6; font-size:0.92rem; line-height:1.7;">
+            <h3 style="color:#FF2A85 !important; font-size:1.3rem;">Mission: Autonomous Safety Before Danger Strikes</h3>
+            <p style="color:#F1F5F9; font-size:0.95rem; line-height:1.8;">
                 Most safety applications only act after an incident occurs (emergency triggers and panics). 
                 <strong>SafeGrid</strong> shifts the paradigm from reactive rescue to <strong>proactive prevention</strong>.
                 By synthesizing geospatial infrastructure data, operational street lighting, crowd volume dynamics, historical incident frequencies, and live anonymous crowdsourced vigilance reports, SafeGrid enables women to navigate cities with confidence and clarity.
@@ -1346,12 +1400,12 @@ with tab_about:
         st.markdown(
             """
             <div class="glam-card">
-                <h4>ML Pipeline and Architecture</h4>
-                <p style="color:#D4C9E6; font-size:0.86rem; line-height:1.6;">
-                    • <strong>Engine</strong>: Gradient Boosted Decision Trees (XGBoost Regressor & Classifier)<br>
-                    • <strong>Geospatial Mesh</strong>: 500m hexagonal and square grid cells across Bhubaneswar<br>
-                    • <strong>Quantile Thresholds</strong>: Low (<=25.1), Medium (25.2-40.4), High (>40.4)<br>
-                    • <strong>Safer Rerouting</strong>: Multi-path candidate trajectory optimization
+                <h4 style="color:#00F0FF; font-size:1.15rem;">ML Pipeline and Architecture</h4>
+                <p style="color:#F1F5F9; font-size:0.9rem; line-height:1.7;">
+                    • <strong style="color:#FFFFFF;">Engine</strong>: Gradient Boosted Decision Trees (XGBoost Regressor & Classifier)<br>
+                    • <strong style="color:#FFFFFF;">Geospatial Mesh</strong>: 500m hexagonal and square grid cells across Bhubaneswar<br>
+                    • <strong style="color:#FFFFFF;">Quantile Thresholds</strong>: Low (<=25.1), Medium (25.2-40.4), High (>40.4)<br>
+                    • <strong style="color:#FFFFFF;">Safer Rerouting</strong>: Multi-path candidate trajectory optimization
                 </p>
             </div>
             """,
@@ -1361,8 +1415,8 @@ with tab_about:
         st.markdown(
             """
             <div class="glam-card">
-                <h4>Code Coven | Infinity Hacks 2026</h4>
-                <p style="color:#D4C9E6; font-size:0.86rem; line-height:1.6;">
+                <h4 style="color:#FFB8D9; font-size:1.15rem;">Code Coven | Infinity Hacks 2026</h4>
+                <p style="color:#F1F5F9; font-size:0.9rem; line-height:1.7;">
                     Built with technology and resilience for every woman navigating the city.
                 </p>
             </div>
@@ -1376,7 +1430,7 @@ with tab_about:
 st.markdown("---")
 st.markdown(
     """
-    <div style="text-align: center; color: #8E88A8; font-size: 0.78rem; padding: 8px 0;">
+    <div style="text-align: center; color: #CBD5E1; font-size: 0.82rem; font-weight: 600; padding: 8px 0;">
         SafeGrid AI Matrix v2.0 | Team Code Coven | Infinity Hacks 2026 | Dedicated to Women Safety Everywhere
     </div>
     """,

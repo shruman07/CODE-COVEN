@@ -229,25 +229,32 @@ def encode_time(time_bucket):
 
 
 # ============================================================
-# RISK BAND
+# TIME-CALIBRATED RISK BAND THRESHOLDS
 # ============================================================
 
-def get_risk_band(score):
-    """
-    low    <= 25.1
-    medium <= 40.4
-    high   > 40.4
-    """
+TIME_THRESHOLDS = {
+    "morning":   {"low": 28.0, "high": 42.0},
+    "afternoon": {"low": 32.0, "high": 46.0},
+    "evening":   {"low": 44.0, "high": 58.0},
+    "night":     {"low": 58.0, "high": 72.0},
+}
 
+def get_risk_band(score, time_bucket="night"):
+    """
+    Convert numeric risk score (0-100) into low/medium/high band.
+    Calibrated across diurnal periods so safe, well-lit corridors
+    are always clearly identified in green.
+    """
     score = float(score)
+    tb = str(time_bucket).lower() if time_bucket else "night"
+    t = TIME_THRESHOLDS.get(tb, {"low": 35.0, "high": 55.0})
 
-    if score <= 25.1:
+    if score <= t["low"]:
         return "low"
-
-    elif score <= 40.4:
+    elif score <= t["high"]:
         return "medium"
-
     return "high"
+
 # ============================================================
 # MODEL PREDICTION FOR ONE DATASET ROW
 # ============================================================
@@ -315,7 +322,7 @@ def predict_risk(lat, lon, time=None):
         "segment_id": segment_id,
         "time_bucket": time_bucket,
         "score": round(score, 1),
-        "band": get_risk_band(score)
+        "band": get_risk_band(score, time_bucket)
     }
 
 
@@ -352,7 +359,7 @@ def get_risk_grid(time=None):
     })[MODEL_FEATURES]
 
     preds = np.clip(model.predict(X), 0.0, 100.0)
-    bands = [get_risk_band(s) for s in preds]
+    bands = [get_risk_band(s, time_bucket) for s in preds]
 
     grid["score"] = np.round(preds, 1)
     grid["band"] = bands
@@ -515,7 +522,7 @@ def get_reroute(start, end, time=None, num_points=25):
         "end": {"lat": end[0], "lon": end[1]},
         "route": [{"lat": lat, "lon": lon} for lat, lon in safest["route"]],
         "average_risk": round(safest["average_risk"], 1),
-        "risk_band": get_risk_band(safest["average_risk"]),
+        "risk_band": get_risk_band(safest["average_risk"], time_bucket),
         "time_bucket": time_bucket,
         "compared_routes": len(candidates)
     }
