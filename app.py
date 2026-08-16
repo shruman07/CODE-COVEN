@@ -1,13 +1,13 @@
 """
-SafeGrid — Cyberpunk Soft-Glam Women's Safety Matrix & AI Navigator
+SafeGrid - Cyberpunk Soft-Glam Women's Safety Matrix and AI Navigator
 Developed by Team Code Coven | Infinity Hacks 2026
 
 Backend ML Integration:
   1. get_risk_grid(time) -> Live city risk grid plotted on interactive Leaflet map
   2. Time selector (morning/afternoon/evening/night) -> Real-time model recalculation
-  3. submit_report(lat, lon, note) -> Instant crowdsourced "Felt Unsafe Here" reporting
+  3. submit_report(lat, lon, note) -> Instant crowdsourced incident reporting
   4. get_reroute(start, end, time) -> Multi-candidate safer routing algorithm
-  5. predict_risk(lat, lon, time) -> Spot safety prediction with risk band & score
+  5. predict_risk(lat, lon, time) -> Spot safety prediction with risk band and score
 """
 
 import os
@@ -50,32 +50,24 @@ except ImportError:
     )
 
 # ============================================================
-# 1. PAGE CONFIGURATION & THEME
+# 1. PAGE CONFIGURATION AND THEME (NO EMOJIS)
 # ============================================================
 st.set_page_config(
-    page_title="SafeGrid ✨ Cyberpunk Soft-Glam Women Safety Matrix",
-    page_icon="🛡️",
+    page_title="SafeGrid | Urban Safety Intelligence and Predictive Navigation",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
 # ============================================================
-# 2. CONSTANTS & PALETTE (CYBERPUNK SOFT GLAM)
+# 2. CONSTANTS AND PALETTE (CYBERPUNK SOFT GLAM)
 # ============================================================
-CITY_CENTER = [20.2961, 85.8245]  # Bhubaneswar Center (Jaydev Vihar / Master Canteen axis)
+CITY_CENTER = [20.2961, 85.8245]  # Bhubaneswar Center
 
-# Color Scheme: Cyberpunk Soft-Glam
-# Green = Low Risk, Solar Amber = Medium Risk, Neon Ruby = High Risk
+# High-contrast solid colors for guaranteed visibility
 BAND_COLORS = {
-    "low": "#00F59B",     # Radiant Mint Emerald (Cyber Low Risk)
-    "medium": "#FFB800",  # Neon Solar Amber (Cyber Caution)
-    "high": "#FF2A55",    # Neon Cyber Ruby (Cyber High Alert)
-}
-
-BAND_ICONS = {
-    "low": "🛡️",
-    "medium": "⚠️",
-    "high": "🚨",
+    "low": "#00E676",     # High-visibility Emerald Green (Low Risk)
+    "medium": "#FFB300",  # Neon Solar Amber (Medium Risk)
+    "high": "#FF1744",    # Neon Crimson Ruby (High Risk)
 }
 
 BAND_LABELS = {
@@ -84,7 +76,7 @@ BAND_LABELS = {
     "high": "ELEVATED RISK (ALERT)",
 }
 
-# Bhubaneswar Popular Landmarks for 1-Click Navigation & Quick Pinning
+# Extensive roster of Bhubaneswar landmarks for user-friendly routing
 POPULAR_LANDMARKS = {
     "KIIT Campus, Patia": (20.3560, 85.8190),
     "Patia / Infocity IT Hub": (20.3520, 85.8200),
@@ -93,57 +85,60 @@ POPULAR_LANDMARKS = {
     "Jaydev Vihar Square": (20.2960, 85.8180),
     "Bhubaneswar Railway Station": (20.2679, 85.8398),
     "Saheed Nagar Market": (20.2940, 85.8420),
-    "Biju Patnaik Airport": (20.2530, 85.8180),
-    "Vani Vihar (Utkal Univ.)": (20.2950, 85.8390),
-    "Kalinga Stadium Area": (20.2870, 85.8250),
+    "Biju Patnaik International Airport": (20.2530, 85.8180),
+    "Vani Vihar (Utkal University)": (20.2950, 85.8390),
+    "Kalinga Stadium Sports Complex": (20.2870, 85.8250),
     "Unit-1 Market Building": (20.2650, 85.8360),
+    "Unit-4 Commercial Area": (20.2760, 85.8420),
     "Chandrasekharpur Housing": (20.3450, 85.8100),
     "Old Town / Lingaraj Temple": (20.2380, 85.8340),
     "Baramunda Bus Terminal": (20.2955, 85.7929),
+    "Khandagiri Square": (20.2610, 85.7780),
+    "Rasulgarh Market Square": (20.2960, 85.8560),
+    "Bapuji Nagar Commercial": (20.2610, 85.8310),
+    "STPI Bhubaneswar": (20.3430, 85.8230),
+    "Nandankanan Road": (20.3940, 85.8180),
 }
 
 # ============================================================
-# 3. CUSTOM CYBERPUNK SOFT-GLAM STYLING (CSS)
+# 3. CUSTOM CYBERPUNK SOFT-GLAM STYLING (CSS - ZERO EMOJIS)
 # ============================================================
 st.markdown(
     """
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap');
 
-    /* Global Root Variables */
     :root {
         --bg-obsidian: #080914;
-        --bg-card: rgba(18, 20, 42, 0.72);
+        --bg-card: rgba(18, 20, 42, 0.85);
         --accent-magenta: #FF2A85;
         --accent-rose: #FFB8D9;
         --accent-cyan: #00F0FF;
         --accent-purple: #9B51E0;
-        --safe-green: #00F59B;
-        --warn-amber: #FFB800;
-        --danger-ruby: #FF2A55;
+        --safe-green: #00E676;
+        --warn-amber: #FFB300;
+        --danger-ruby: #FF1744;
         --text-primary: #FFFFFF;
         --text-secondary: #D4C9E6;
-        --border-glass: rgba(255, 42, 133, 0.22);
+        --border-glass: rgba(255, 42, 133, 0.25);
     }
 
-    /* Overall App Background */
+    /* Overall Application Background */
     .stApp {
         background: radial-gradient(circle at 10% 20%, rgba(255, 42, 133, 0.08) 0%, transparent 40%),
                     radial-gradient(circle at 90% 80%, rgba(155, 81, 224, 0.1) 0%, transparent 40%),
-                    radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.04) 0%, transparent 60%),
                     #080914 !important;
         font-family: 'Outfit', sans-serif !important;
         color: #FFFFFF !important;
     }
 
-    /* Headers & Typography */
+    /* Headers and Titles */
     h1, h2, h3, h4, h5, h6 {
         font-family: 'Space Grotesk', sans-serif !important;
         letter-spacing: -0.02em;
         color: #FFFFFF !important;
     }
 
-    /* Glam Gradient Headers */
     .glam-title {
         font-family: 'Syne', sans-serif;
         font-weight: 800;
@@ -151,93 +146,90 @@ st.markdown(
         background: linear-gradient(135deg, #FFFFFF 0%, #FFB8D9 45%, #FF2A85 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 25px rgba(255, 42, 133, 0.35);
-        margin-bottom: 0.2rem;
+        letter-spacing: 0.02em;
+        margin-bottom: 0.1rem;
     }
 
     .glam-subtitle {
         font-family: 'Outfit', sans-serif;
-        font-weight: 400;
+        font-weight: 500;
         color: #C8BEDE;
-        font-size: 1rem;
-        letter-spacing: 0.04em;
+        font-size: 0.95rem;
+        letter-spacing: 0.06em;
         text-transform: uppercase;
         margin-bottom: 1rem;
     }
 
-    /* Glassmorphism Cards */
+    /* Surface Cards */
     .glam-card {
-        background: rgba(18, 20, 42, 0.72);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        background: rgba(18, 20, 42, 0.85);
         border: 1px solid rgba(255, 42, 133, 0.25);
-        border-radius: 16px;
+        border-radius: 14px;
         padding: 1.2rem;
-        box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.45);
+        box-shadow: 0 8px 30px 0 rgba(0, 0, 0, 0.5);
         margin-bottom: 1rem;
     }
 
-    /* Status Pill / Live Radar */
+    /* Status Badges */
     .live-badge {
         display: inline-flex;
         align-items: center;
-        gap: 0.4rem;
-        background: rgba(0, 245, 155, 0.12);
-        border: 1px solid rgba(0, 245, 155, 0.4);
-        color: #00F59B;
-        padding: 0.25rem 0.75rem;
-        border-radius: 999px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        letter-spacing: 0.05em;
+        gap: 0.5rem;
+        background: rgba(0, 230, 118, 0.12);
+        border: 1px solid rgba(0, 230, 118, 0.4);
+        color: #00E676;
+        padding: 0.3rem 0.8rem;
+        border-radius: 6px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        box-shadow: 0 0 10px rgba(0, 245, 155, 0.2);
     }
 
     .live-pulse {
         width: 8px;
         height: 8px;
-        background-color: #00F59B;
+        background-color: #00E676;
         border-radius: 50%;
-        box-shadow: 0 0 10px #00F59B;
+        box-shadow: 0 0 8px #00E676;
         animation: pulse 1.6s infinite;
     }
 
     @keyframes pulse {
         0% { transform: scale(0.95); opacity: 0.7; }
-        50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 15px #00F59B; }
+        50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 12px #00E676; }
         100% { transform: scale(0.95); opacity: 0.7; }
     }
 
-    /* Cyber Buttons */
+    /* Primary Interactive Buttons */
     div.stButton > button {
         background: linear-gradient(135deg, #FF2A85 0%, #B71C5A 100%) !important;
         color: #FFFFFF !important;
         font-family: 'Space Grotesk', sans-serif !important;
         font-weight: 600 !important;
         border: 1px solid rgba(255, 184, 217, 0.3) !important;
-        border-radius: 12px !important;
+        border-radius: 10px !important;
         padding: 0.5rem 1.2rem !important;
-        box-shadow: 0 4px 18px rgba(255, 42, 133, 0.35) !important;
-        transition: all 0.25s ease-in-out !important;
+        box-shadow: 0 4px 16px rgba(255, 42, 133, 0.35) !important;
+        transition: all 0.2s ease-in-out !important;
         width: 100%;
     }
     div.stButton > button:hover {
         background: linear-gradient(135deg, #FF4598 0%, #D1236E 100%) !important;
-        box-shadow: 0 6px 24px rgba(255, 42, 133, 0.55) !important;
-        transform: translateY(-2px);
+        box-shadow: 0 6px 22px rgba(255, 42, 133, 0.55) !important;
+        transform: translateY(-1px);
     }
 
-    /* SOS Red Button */
+    /* Red Action Button */
     .sos-btn div.stButton > button {
-        background: linear-gradient(135deg, #FF2A55 0%, #B3002D 100%) !important;
-        box-shadow: 0 4px 22px rgba(255, 42, 85, 0.55) !important;
+        background: linear-gradient(135deg, #FF1744 0%, #B3002D 100%) !important;
+        box-shadow: 0 4px 20px rgba(255, 23, 68, 0.5) !important;
         border: 1px solid rgba(255, 100, 130, 0.5) !important;
-        font-size: 1.05rem !important;
         font-weight: 700 !important;
+        font-size: 0.95rem !important;
     }
 
-    /* Metric Cards */
+    /* Metric Containers */
     [data-testid="stMetricValue"] {
         font-family: 'Space Grotesk', sans-serif !important;
         font-weight: 700 !important;
@@ -251,98 +243,109 @@ st.markdown(
         letter-spacing: 0.05em;
     }
 
-    /* Streamlit Selectbox / Input styling */
+    /* Form Fields */
     div[data-baseweb="select"] > div,
     div[data-baseweb="input"] > div {
-        background-color: rgba(14, 16, 36, 0.9) !important;
+        background-color: rgba(14, 16, 36, 0.95) !important;
         border-color: rgba(255, 42, 133, 0.3) !important;
-        border-radius: 10px !important;
+        border-radius: 8px !important;
         color: #FFFFFF !important;
     }
 
-    /* Tabs Styling */
+    /* Workspace Tabs */
     .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-        background-color: rgba(15, 17, 36, 0.7);
+        gap: 6px;
+        background-color: rgba(15, 17, 36, 0.8);
         padding: 6px;
-        border-radius: 14px;
+        border-radius: 12px;
         border: 1px solid rgba(255, 42, 133, 0.2);
     }
     .stTabs [data-baseweb="tab"] {
         background-color: transparent;
-        border-radius: 10px;
+        border-radius: 8px;
         color: #A69DBB;
         font-family: 'Space Grotesk', sans-serif;
         font-weight: 600;
-        font-size: 0.9rem;
-        padding: 8px 18px;
+        font-size: 0.88rem;
+        padding: 8px 16px;
     }
     .stTabs [aria-selected="true"] {
         background: linear-gradient(135deg, rgba(255, 42, 133, 0.35) 0%, rgba(155, 81, 224, 0.35) 100%) !important;
         color: #FFFFFF !important;
         font-weight: 700 !important;
         border: 1px solid rgba(255, 42, 133, 0.6) !important;
-        box-shadow: 0 0 15px rgba(255, 42, 133, 0.3);
+        box-shadow: 0 0 12px rgba(255, 42, 133, 0.3);
     }
 
-    /* Sidebar Styling */
+    /* Sidebar Navigation */
     section[data-testid="stSidebar"] {
         background-color: #0B0C1E !important;
-        border-right: 1px solid rgba(255, 42, 133, 0.18) !important;
+        border-right: 1px solid rgba(255, 42, 133, 0.2) !important;
     }
 
-    /* Risk Badges */
-    .risk-badge-low {
-        background: rgba(0, 245, 155, 0.15);
-        color: #00F59B;
-        border: 1px solid #00F59B;
+    /* Risk Text Badges */
+    .badge-low {
+        background: rgba(0, 230, 118, 0.18);
+        color: #00E676;
+        border: 1px solid #00E676;
         padding: 3px 8px;
-        border-radius: 6px;
+        border-radius: 5px;
         font-weight: 700;
         font-size: 0.8rem;
+        display: inline-block;
     }
-    .risk-badge-medium {
-        background: rgba(255, 184, 0, 0.15);
-        color: #FFB800;
-        border: 1px solid #FFB800;
+    .badge-medium {
+        background: rgba(255, 179, 0, 0.18);
+        color: #FFB300;
+        border: 1px solid #FFB300;
         padding: 3px 8px;
-        border-radius: 6px;
+        border-radius: 5px;
         font-weight: 700;
         font-size: 0.8rem;
+        display: inline-block;
     }
-    .risk-badge-high {
-        background: rgba(255, 42, 85, 0.18);
-        color: #FF2A55;
-        border: 1px solid #FF2A55;
+    .badge-high {
+        background: rgba(255, 23, 68, 0.2);
+        color: #FF1744;
+        border: 1px solid #FF1744;
         padding: 3px 8px;
-        border-radius: 6px;
+        border-radius: 5px;
         font-weight: 700;
         font-size: 0.8rem;
+        display: inline-block;
     }
 
-    /* Helpline Card */
+    /* Helpline Container */
     .helpline-box {
-        background: rgba(20, 24, 50, 0.85);
+        background: rgba(20, 24, 50, 0.9);
         border: 1px solid rgba(255, 184, 217, 0.2);
-        border-radius: 12px;
+        border-radius: 10px;
         padding: 10px;
         text-align: center;
         transition: all 0.2s;
     }
     .helpline-box:hover {
         border-color: #FF2A85;
-        box-shadow: 0 0 15px rgba(255, 42, 133, 0.3);
+        box-shadow: 0 0 12px rgba(255, 42, 133, 0.35);
     }
     .helpline-num {
         font-family: 'Space Grotesk', sans-serif;
-        font-size: 1.3rem;
+        font-size: 1.25rem;
         font-weight: 800;
         color: #FFB8D9;
     }
     .helpline-desc {
-        font-size: 0.72rem;
+        font-size: 0.7rem;
         color: #A99EBE;
         text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    /* Fixed Map Canvas Background */
+    iframe {
+        background-color: #0c0e1e !important;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 42, 133, 0.25) !important;
     }
     </style>
     """,
@@ -359,10 +362,12 @@ if "selected_point" not in st.session_state:
     st.session_state["selected_point"] = CITY_CENTER
 
 if "start_coords" not in st.session_state:
-    st.session_state["start_coords"] = (20.3560, 85.8190)  # KIIT Campus
+    st.session_state["start_coords"] = POPULAR_LANDMARKS["KIIT Campus, Patia"]
+    st.session_state["start_name"] = "KIIT Campus, Patia"
 
 if "end_coords" not in st.session_state:
-    st.session_state["end_coords"] = (20.2990, 85.8420)    # Esplanade Mall
+    st.session_state["end_coords"] = POPULAR_LANDMARKS["Esplanade One Mall, Rasulgarh"]
+    st.session_state["end_name"] = "Esplanade One Mall, Rasulgarh"
 
 if "calculated_route" not in st.session_state:
     st.session_state["calculated_route"] = None
@@ -373,8 +378,8 @@ if "report_success_toast" not in st.session_state:
 if "fake_call_step" not in st.session_state:
     st.session_state["fake_call_step"] = "idle"
 
-if "grid_density" not in st.session_state:
-    st.session_state["grid_density"] = "Optimized (Fast & Smooth)"
+if "map_selection_mode" not in st.session_state:
+    st.session_state["map_selection_mode"] = "start"
 
 # ============================================================
 # 5. CACHED BACKEND DATA LOADER
@@ -389,10 +394,11 @@ def get_current_time_bucket():
     hour = datetime.now().hour
     return get_time_bucket(hour)
 
-def generate_leaflet_map(risk_grid, route_data=None, selected_latlon=None, density="Optimized (Fast & Smooth)"):
+def generate_leaflet_map(risk_grid, route_data=None, selected_latlon=None):
     """
-    Build Folium map with Cyberpunk Soft-Glam styling.
-    Band colors: Green (Low), Yellow (Medium), Red (High).
+    Build Folium map with high-visibility markers and solid contrast.
+    Low Risk = Emerald Green, Medium Risk = Amber, High Risk = Crimson Red.
+    Maintains solid opacity without fading or lightening on user interaction.
     """
     m = folium.Map(
         location=CITY_CENTER,
@@ -401,29 +407,32 @@ def generate_leaflet_map(risk_grid, route_data=None, selected_latlon=None, densi
         control_scale=True,
     )
 
-    # Subsample if optimized mode to keep 60 FPS in browser
-    if density == "Optimized (Fast & Smooth)" and len(risk_grid) > 450:
-        # Step subsample evenly to cover all city zones smoothly
-        display_grid = risk_grid[::4]
-    else:
-        display_grid = risk_grid
+    # 1. Stratified Grid Sampling to guarantee clear presence of ALL risk bands
+    # Collect all low risk, medium risk, and high risk segments
+    low_cells = [c for c in risk_grid if c.get("band") == "low"]
+    med_cells = [c for c in risk_grid if c.get("band") == "medium"]
+    high_cells = [c for c in risk_grid if c.get("band") == "high"]
 
-    # 1. Risk Grid Feature Group
-    grid_group = folium.FeatureGroup(name="SafeGrid Risk Points", show=True)
+    # Keep all green points and sample medium/high to maintain 60 FPS and crisp visibility
+    display_grid = low_cells + med_cells[::2] + high_cells[::2]
+
+    # Feature Group for Risk Points
+    grid_group = folium.FeatureGroup(name="SafeGrid Monitored Segments", show=True)
 
     for cell in display_grid:
         band = cell.get("band", "medium")
-        color = BAND_COLORS.get(band, "#FFB800")
+        color = BAND_COLORS.get(band, "#FFB300")
         score = cell.get("score", 0.0)
         landmark = cell.get("landmark", f"Segment {cell.get('segment_id', '')}")
         zone = cell.get("zone_type", "Urban Area").replace("_", " ").title()
 
+        # Solid HTML card with dark background
         popup_html = f"""
-        <div style="font-family: 'Outfit', sans-serif; background: #0E1022; color: #FFFFFF; padding: 10px; border-radius: 10px; border: 1px solid {color}; width: 200px;">
+        <div style="font-family: 'Outfit', sans-serif; background: #0E1022; color: #FFFFFF; padding: 10px; border-radius: 8px; border: 1px solid {color}; width: 210px;">
             <div style="font-size: 12px; font-weight: 700; color: #FFB8D9; margin-bottom: 2px;">{landmark}</div>
             <div style="font-size: 10px; color: #8E88A8; margin-bottom: 6px;">Zone: {zone}</div>
-            <div style="background: {color}22; border: 1px solid {color}; color: {color}; font-weight: 800; font-size: 11px; padding: 3px 6px; border-radius: 5px; text-align: center; text-transform: uppercase;">
-                {BAND_ICONS.get(band, '🛡️')} {BAND_LABELS.get(band, band.upper())}
+            <div style="background: {color}25; border: 1px solid {color}; color: {color}; font-weight: 800; font-size: 11px; padding: 3px 6px; border-radius: 4px; text-align: center; text-transform: uppercase;">
+                [{band.upper()} RISK]
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 10px; color: #D4C9E6; border-top: 1px solid #252848; margin-top: 6px; padding-top: 4px;">
                 <span>AI Risk Score:</span>
@@ -432,15 +441,17 @@ def generate_leaflet_map(risk_grid, route_data=None, selected_latlon=None, densi
         </div>
         """
 
-        tooltip_text = f"{BAND_ICONS.get(band, '🛡️')} {band.upper()} RISK | {landmark}"
+        tooltip_text = f"[{band.upper()} RISK] {landmark} ({score}/100)"
 
+        # Solid CircleMarker: high fill_opacity and solid border to prevent lightening
         folium.CircleMarker(
             location=[cell["lat"], cell["lon"]],
-            radius=8,
+            radius=7.5,
             color=color,
             fill=True,
             fill_color=color,
-            fill_opacity=0.75,
+            fill_opacity=0.90,
+            opacity=1.0,
             weight=1.5,
             tooltip=tooltip_text,
             popup=folium.Popup(popup_html, max_width=230),
@@ -449,67 +460,68 @@ def generate_leaflet_map(risk_grid, route_data=None, selected_latlon=None, densi
     grid_group.add_to(m)
 
     # 2. Key Anchor Landmarks
-    landmark_group = folium.FeatureGroup(name="Bhubaneswar Landmarks", show=True)
+    landmark_group = folium.FeatureGroup(name="Bhubaneswar Urban Landmarks", show=True)
     for name, coords in POPULAR_LANDMARKS.items():
         folium.CircleMarker(
             location=coords,
-            radius=5,
+            radius=4.5,
             color="#FF2A85",
             fill=True,
             fill_color="#FFFFFF",
-            fill_opacity=0.95,
+            fill_opacity=1.0,
+            opacity=1.0,
             weight=2,
-            tooltip=f"📍 {name}",
+            tooltip=f"Landmark: {name}",
         ).add_to(landmark_group)
     landmark_group.add_to(m)
 
-    # 3. User Selected Pin
+    # 3. Selected User Target Location Marker
     if selected_latlon:
         folium.Marker(
             location=selected_latlon,
-            tooltip="🎯 Selected Location Pin",
-            icon=folium.Icon(color="pink", icon="crosshairs", prefix="fa"),
+            tooltip="Selected Coordinate",
+            icon=folium.Icon(color="purple", icon="info-sign"),
         ).add_to(m)
 
-    # 4. Computed Safer Route
+    # 4. Computed AI Safer Route (Solid Emerald Polyline)
     if route_data and "route" in route_data:
         coords = [(p["lat"], p["lon"]) for p in route_data["route"]]
         if coords:
+            # Solid non-fading PolyLine
             folium.PolyLine(
                 coords,
-                color="#00F59B",
+                color="#00E676",
                 weight=6,
-                opacity=0.95,
-                tooltip=f"AI Safer Route (Risk Band: {route_data.get('risk_band', 'LOW').upper()})",
+                opacity=1.0,
+                tooltip=f"Safe Route - Band: {route_data.get('risk_band', 'LOW').upper()} (Score: {route_data.get('average_risk', 0.0)})",
             ).add_to(m)
 
             folium.Marker(
                 coords[0],
-                tooltip="🟢 Start Point",
-                icon=folium.Icon(color="green", icon="play", prefix="fa"),
+                tooltip="Start Location",
+                icon=folium.Icon(color="green", icon="play"),
             ).add_to(m)
 
             folium.Marker(
                 coords[-1],
-                tooltip="🏁 Safe Destination",
-                icon=folium.Icon(color="red", icon="flag-checkered", prefix="fa"),
+                tooltip="Destination Location",
+                icon=folium.Icon(color="red", icon="stop"),
             ).add_to(m)
 
     folium.LayerControl(position="topright").add_to(m)
     return m
 
 # ============================================================
-# 6. SIDEBAR: TIME SELECTOR & EMERGENCY HOTLINES
+# 6. SIDEBAR: TIME SELECTOR AND EMERGENCY HOTLINES
 # ============================================================
 with st.sidebar:
     st.markdown(
         """
         <div style="text-align: center; padding: 0.5rem 0 1rem 0;">
-            <div style="font-size: 2.2rem; filter: drop-shadow(0 0 12px #FF2A85);">🛡️✨</div>
-            <div style="font-family: 'Syne', sans-serif; font-size: 1.45rem; font-weight: 800; color: #FFFFFF;">SAFEGRID</div>
-            <div style="font-size: 0.72rem; color: #FFB8D9; letter-spacing: 0.1em; text-transform: uppercase;">Code Coven • Infinity Hacks</div>
+            <div style="font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: #FFFFFF;">SAFEGRID</div>
+            <div style="font-size: 0.72rem; color: #FFB8D9; letter-spacing: 0.1em; text-transform: uppercase;">Code Coven | Infinity Hacks 2026</div>
             <div style="margin-top: 8px;">
-                <span class="live-badge"><span class="live-pulse"></span> SYSTEM ACTIVE • BHUBANESWAR</span>
+                <span class="live-badge"><span class="live-pulse"></span> SYSTEM ACTIVE | BHUBANESWAR</span>
             </div>
         </div>
         """,
@@ -519,12 +531,13 @@ with st.sidebar:
     st.markdown("---")
 
     # Time-of-Day Matrix
-    st.markdown("### ⏱️ Time-of-Day Matrix")
+    st.markdown("### Time-of-Day Matrix")
+    st.caption("City risk profiles adjust dynamically with lighting and crowd density changes across hours.")
     time_options = ["morning", "afternoon", "evening", "night"]
     current_detected = get_current_time_bucket()
 
     selected_time = st.select_slider(
-        "Select Time Bucket",
+        "Active Time Bucket",
         options=time_options,
         value=st.session_state["time_of_day"],
         key="time_slider_sidebar",
@@ -535,28 +548,18 @@ with st.sidebar:
 
     c_btn1, c_btn2 = st.columns(2)
     with c_btn1:
-        if st.button("🌙 Set Night", use_container_width=True):
+        if st.button("Set Night Mode", use_container_width=True):
             st.session_state["time_of_day"] = "night"
             st.rerun()
     with c_btn2:
-        if st.button(f"⚡ Sync ({current_detected})", use_container_width=True):
+        if st.button(f"Sync Local ({current_detected})", use_container_width=True):
             st.session_state["time_of_day"] = current_detected
             st.rerun()
-
-    # Map Density Setting
-    st.markdown("---")
-    st.markdown("### ⚙️ Map Rendering")
-    st.session_state["grid_density"] = st.radio(
-        "Grid Density",
-        options=["Optimized (Fast & Smooth)", "Full High Density (2,200 points)"],
-        index=0,
-        key="grid_density_radio",
-    )
 
     st.markdown("---")
 
     # Emergency Hotlines
-    st.markdown("### 🚨 Emergency Hotlines")
+    st.markdown("### Emergency Hotlines")
     h_col1, h_col2 = st.columns(2)
     with h_col1:
         st.markdown(
@@ -611,7 +614,7 @@ with st.sidebar:
 
     st.markdown("---")
     b_info = backend_info()
-    st.caption(f"🛡️ Monitored: **{b_info['segments']}** segments | Model: **XGBoost AI**")
+    st.caption(f"Monitored Segments: **{b_info['segments']}** | Engine: **XGBoost AI**")
 
 # ============================================================
 # 7. MAIN APPLICATION HEADER
@@ -619,21 +622,21 @@ with st.sidebar:
 header_col1, header_col2 = st.columns([3, 1])
 
 with header_col1:
-    st.markdown('<div class="glam-title">🛡️ SAFEGRID MATRIX</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-title">SAFEGRID MATRIX</div>', unsafe_allow_html=True)
     st.markdown(
-        '<div class="glam-subtitle">Predictive Urban Safety Intelligence & AI Guardian for Women</div>',
+        '<div class="glam-subtitle">Predictive Urban Safety Intelligence and AI Navigation for Women</div>',
         unsafe_allow_html=True,
     )
 
 with header_col2:
     current_bucket = st.session_state["time_of_day"]
-    bucket_badge_color = "#FF2A55" if current_bucket == "night" else ("#FFB800" if current_bucket == "evening" else "#00F59B")
+    bucket_badge_color = "#FF1744" if current_bucket == "night" else ("#FFB300" if current_bucket == "evening" else "#00E676")
     st.markdown(
         f"""
         <div style="text-align: right; padding-top: 0.4rem;">
             <div style="font-size: 0.78rem; color: #8E88A8;">ACTIVE TIME BUCKET</div>
             <div style="font-family: 'Space Grotesk'; font-size: 1.35rem; font-weight: 700; color: {bucket_badge_color}; text-transform: uppercase;">
-                {current_bucket} MODE ⚡
+                {current_bucket} MODE
             </div>
         </div>
         """,
@@ -641,19 +644,19 @@ with header_col2:
     )
 
 # ============================================================
-# 8. APP WORKSPACES (TABS)
+# 8. APP WORKSPACES (TABS - ZERO EMOJIS)
 # ============================================================
 tab_map, tab_sos, tab_companion, tab_feed, tab_analytics, tab_about = st.tabs([
-    "🗺️ Live SafeGrid & Navigation",
-    "🚨 SOS Guardian & Alarm",
-    "🚶‍♀️ Walk-With-Me Companion",
-    "📢 Community Incident Feed",
-    "📊 City Safety Analytics",
-    "ℹ️ SafeGrid AI Intelligence",
+    "Live SafeGrid and Navigation",
+    "Emergency Dispatch and Siren",
+    "Walk-With-Me Companion",
+    "Community Incident Feed",
+    "Urban Safety Analytics",
+    "System Architecture and ML",
 ])
 
 # ==============================================================================
-# TAB 1: LIVE SAFEGRID & NAVIGATION (MAP + REPORTING + ROUTING)
+# TAB 1: LIVE SAFEGRID AND NAVIGATION (MAP + REPORTING + ROUTING)
 # ==============================================================================
 with tab_map:
     # 1. Fetch risk grid for selected time bucket
@@ -669,26 +672,29 @@ with tab_map:
     # Metrics Bar
     m_col1, m_col2, m_col3, m_col4 = st.columns(4)
     with m_col1:
-        st.metric("Monitored Segments", f"{total_points} Units")
+        st.metric("Total Segments", f"{total_points} Blocks")
     with m_col2:
-        st.metric("🟢 Low Risk (Safe)", f"{low_risk_count} ({low_risk_count/max(1,total_points)*100:.0f}%)")
+        st.metric("Low Risk (Safe)", f"{low_risk_count} ({low_risk_count/max(1,total_points)*100:.0f}%)")
     with m_col3:
-        st.metric("🟡 Moderate (Caution)", f"{med_risk_count} ({med_risk_count/max(1,total_points)*100:.0f}%)")
+        st.metric("Moderate Risk (Caution)", f"{med_risk_count} ({med_risk_count/max(1,total_points)*100:.0f}%)")
     with m_col4:
-        st.metric("🔴 Elevated Risk (Alert)", f"{high_risk_count} ({high_risk_count/max(1,total_points)*100:.0f}%)")
+        st.metric("Elevated Risk (Alert)", f"{high_risk_count} ({high_risk_count/max(1,total_points)*100:.0f}%)")
 
-    st.markdown("<div style='height: 6px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 4px;'></div>", unsafe_allow_html=True)
 
-    # Layout: Map (Left 65%) vs Command Panel (Right 35%)
+    # Layout: Map (Left 64%) vs Command Deck (Right 36%)
     map_col, panel_col = st.columns([64, 36])
 
     with map_col:
+        # High-contrast legend bar
         st.markdown(
             """
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                <span style="font-weight: 600; font-size: 0.95rem; color: #FFB8D9;">🗺️ Bhubaneswar Live Risk Map</span>
-                <span style="font-size: 0.78rem; color: #8E88A8;">
-                    🟢 Low &nbsp;|&nbsp; 🟡 Caution &nbsp;|&nbsp; 🔴 Alert &nbsp; (Click map point to select)
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; background: rgba(18,20,42,0.9); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,42,133,0.2);">
+                <span style="font-weight: 700; font-size: 0.88rem; color: #FFFFFF;">Bhubaneswar Live Risk Heatmap</span>
+                <span style="font-size: 0.8rem;">
+                    <span class="badge-low">GREEN = LOW RISK</span> &nbsp;
+                    <span class="badge-medium">AMBER = MEDIUM RISK</span> &nbsp;
+                    <span class="badge-high">RED = HIGH RISK</span>
                 </span>
             </div>
             """,
@@ -700,7 +706,6 @@ with tab_map:
             risk_grid=risk_grid,
             route_data=st.session_state.get("calculated_route"),
             selected_latlon=st.session_state.get("selected_point"),
-            density=st.session_state.get("grid_density", "Optimized (Fast & Smooth)"),
         )
 
         # Render Folium Map
@@ -712,98 +717,142 @@ with tab_map:
             returned_objects=["last_clicked"],
         )
 
-        # Detect User Map Clicks
+        # Map Clicks detection
         clicked_coords = None
         if map_output and map_output.get("last_clicked"):
-            clicked_lat = map_output["last_clicked"]["lat"]
-            clicked_lng = map_output["last_clicked"]["lng"]
+            clicked_lat = round(map_output["last_clicked"]["lat"], 5)
+            clicked_lng = round(map_output["last_clicked"]["lng"], 5)
             clicked_coords = (clicked_lat, clicked_lng)
             st.session_state["selected_point"] = [clicked_lat, clicked_lng]
 
-        st.caption("✨ **Pro Tip**: Click any map spot to auto-fill coordinates in the reporter or safe route finder.")
+            # If user is in "Pick on Map" mode for routing
+            if st.session_state.get("map_selection_mode") == "start":
+                st.session_state["start_coords"] = (clicked_lat, clicked_lng)
+                st.session_state["start_name"] = f"Map Pin ({clicked_lat:.4f}, {clicked_lng:.4f})"
+            elif st.session_state.get("map_selection_mode") == "end":
+                st.session_state["end_coords"] = (clicked_lat, clicked_lng)
+                st.session_state["end_name"] = f"Map Pin ({clicked_lat:.4f}, {clicked_lng:.4f})"
+
+        st.caption("Tip: Select 'Pick on Map' mode on the right to set Start or Destination by clicking anywhere on the map.")
 
     # ------------------------------------------------------------
-    # RIGHT COMMAND DECK
+    # RIGHT COMMAND DECK: USER-FRIENDLY ROUTING AND REPORTING
     # ------------------------------------------------------------
     with panel_col:
         deck_tab_route, deck_tab_report, deck_tab_spot = st.tabs([
-            "🧭 AI Safe Route",
-            "🚨 Felt Unsafe Here?",
-            "🔍 Spot Inspector",
+            "AI Safe Route",
+            "Felt Unsafe Here?",
+            "Spot Inspector",
         ])
 
         # ------------------------------------------------------------
-        # SUB-TAB 1: AI SAFE ROUTE GENERATOR
+        # SUB-TAB 1: USER-FRIENDLY AI SAFE ROUTE GENERATOR
         # ------------------------------------------------------------
         with deck_tab_route:
-            st.markdown("#### 🧭 Predictive Safe Navigation")
-            st.caption("SafeGrid calculates multi-path candidate trajectories and selects the lowest-risk path.")
+            st.markdown("#### AI Safe Route Navigator")
+            st.caption("Calculates safer alternative paths avoiding unlit streets and high incident zones.")
 
-            # Quick Preset Selector
-            preset_choice = st.selectbox(
-                "⚡ 1-Click Popular Bhubaneswar Routes",
-                options=[
-                    "Custom Coordinates",
-                    "KIIT Campus ➔ Esplanade One Mall",
-                    "Master Canteen ➔ Patia Infocity",
-                    "Vani Vihar ➔ Saheed Nagar Market",
-                    "Baramunda Bus Stand ➔ Jaydev Vihar",
-                    "Biju Patnaik Airport ➔ Master Canteen",
-                ],
-                key="route_preset_select",
+            route_input_method = st.radio(
+                "Input Mode",
+                options=["Landmark Directory", "Pick on Map", "Enter Coordinates"],
+                horizontal=True,
+                key="route_input_mode_radio",
             )
 
-            # Preset Auto-fill
-            if preset_choice == "KIIT Campus ➔ Esplanade One Mall":
-                st.session_state["start_coords"] = POPULAR_LANDMARKS["KIIT Campus, Patia"]
-                st.session_state["end_coords"] = POPULAR_LANDMARKS["Esplanade One Mall, Rasulgarh"]
-            elif preset_choice == "Master Canteen ➔ Patia Infocity":
-                st.session_state["start_coords"] = POPULAR_LANDMARKS["Master Canteen Square"]
-                st.session_state["end_coords"] = POPULAR_LANDMARKS["Patia / Infocity IT Hub"]
-            elif preset_choice == "Vani Vihar ➔ Saheed Nagar Market":
-                st.session_state["start_coords"] = POPULAR_LANDMARKS["Vani Vihar (Utkal Univ.)"]
-                st.session_state["end_coords"] = POPULAR_LANDMARKS["Saheed Nagar Market"]
-            elif preset_choice == "Baramunda Bus Stand ➔ Jaydev Vihar":
-                st.session_state["start_coords"] = POPULAR_LANDMARKS["Baramunda Bus Terminal"]
-                st.session_state["end_coords"] = POPULAR_LANDMARKS["Jaydev Vihar Square"]
-            elif preset_choice == "Biju Patnaik Airport ➔ Master Canteen":
-                st.session_state["start_coords"] = POPULAR_LANDMARKS["Biju Patnaik Airport"]
-                st.session_state["end_coords"] = POPULAR_LANDMARKS["Master Canteen Square"]
+            # MODE A: Landmark Directory (User Friendly Default)
+            if route_input_method == "Landmark Directory":
+                landmark_names = list(POPULAR_LANDMARKS.keys())
 
-            # Start Point
-            st.markdown("<div style='font-weight:600; font-size:0.82rem; color:#00F59B; margin-top:6px;'>🟢 ORIGIN (START)</div>", unsafe_allow_html=True)
-            r_start_c1, r_start_c2 = st.columns(2)
-            with r_start_c1:
-                start_lat_val = st.number_input("Start Lat", value=float(st.session_state["start_coords"][0]), format="%.5f", key="in_start_lat")
-            with r_start_c2:
-                start_lon_val = st.number_input("Start Lon", value=float(st.session_state["start_coords"][1]), format="%.5f", key="in_start_lon")
+                # Origin selector
+                default_start_idx = landmark_names.index("KIIT Campus, Patia") if "KIIT Campus, Patia" in landmark_names else 0
+                chosen_start_name = st.selectbox(
+                    "Start Location (Origin)",
+                    options=landmark_names,
+                    index=default_start_idx,
+                    key="sel_start_landmark",
+                )
+                st.session_state["start_coords"] = POPULAR_LANDMARKS[chosen_start_name]
+                st.session_state["start_name"] = chosen_start_name
 
-            # Destination Point
-            st.markdown("<div style='font-weight:600; font-size:0.82rem; color:#FF2A85; margin-top:4px;'>🏁 DESTINATION (END)</div>", unsafe_allow_html=True)
-            r_end_c1, r_end_c2 = st.columns(2)
-            with r_end_c1:
-                end_lat_val = st.number_input("End Lat", value=float(st.session_state["end_coords"][0]), format="%.5f", key="in_end_lat")
-            with r_end_c2:
-                end_lon_val = st.number_input("End Lon", value=float(st.session_state["end_coords"][1]), format="%.5f", key="in_end_lon")
-
-            # Map Click Assignment Buttons
-            if clicked_coords:
-                c_set_s, c_set_e = st.columns(2)
-                with c_set_s:
-                    if st.button("📍 Set Click as Start", key="btn_set_start_clicked"):
-                        st.session_state["start_coords"] = clicked_coords
+                # Swap button
+                c_swap1, c_swap2 = st.columns([3, 1])
+                with c_swap2:
+                    if st.button("Swap Locations", key="btn_swap_landmarks"):
+                        temp_c = st.session_state["start_coords"]
+                        temp_n = st.session_state["start_name"]
+                        st.session_state["start_coords"] = st.session_state["end_coords"]
+                        st.session_state["start_name"] = st.session_state["end_name"]
+                        st.session_state["end_coords"] = temp_c
+                        st.session_state["end_name"] = temp_n
                         st.rerun()
-                with c_set_e:
-                    if st.button("🎯 Set Click as End", key="btn_set_end_clicked"):
-                        st.session_state["end_coords"] = clicked_coords
-                        st.rerun()
+
+                # Destination selector
+                default_end_idx = landmark_names.index("Esplanade One Mall, Rasulgarh") if "Esplanade One Mall, Rasulgarh" in landmark_names else 1
+                chosen_end_name = st.selectbox(
+                    "End Location (Destination)",
+                    options=landmark_names,
+                    index=default_end_idx,
+                    key="sel_end_landmark",
+                )
+                st.session_state["end_coords"] = POPULAR_LANDMARKS[chosen_end_name]
+                st.session_state["end_name"] = chosen_end_name
+
+            # MODE B: Pick on Map
+            elif route_input_method == "Pick on Map":
+                st.markdown(
+                    """
+                    <div style="background: rgba(18,20,42,0.9); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,230,118,0.3); font-size: 0.85rem;">
+                        Select which point to set, then click anywhere on the map:
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+                st.session_state["map_selection_mode"] = st.radio(
+                    "Clicking Map Sets:",
+                    options=["Start Location", "Destination Location"],
+                    index=0 if st.session_state.get("map_selection_mode") == "start" else 1,
+                    horizontal=True,
+                )
+                if st.session_state["map_selection_mode"] == "Start Location":
+                    st.session_state["map_selection_mode"] = "start"
+                else:
+                    st.session_state["map_selection_mode"] = "end"
+
+                st.markdown(
+                    f"""
+                    <div style="margin-top: 8px; font-size: 0.82rem; color: #D4C9E6;">
+                        • <strong>Origin:</strong> {st.session_state.get('start_name', 'Not set')} <code>({st.session_state['start_coords'][0]:.4f}, {st.session_state['start_coords'][1]:.4f})</code><br>
+                        • <strong>Destination:</strong> {st.session_state.get('end_name', 'Not set')} <code>({st.session_state['end_coords'][0]:.4f}, {st.session_state['end_coords'][1]:.4f})</code>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+            # MODE C: Enter Coordinates
+            else:
+                st.markdown("<div style='font-size:0.8rem; font-weight:700; color:#00E676; margin-top:6px;'>ORIGIN COORDINATES</div>", unsafe_allow_html=True)
+                rc1, rc2 = st.columns(2)
+                with rc1:
+                    s_lat = st.number_input("Start Lat", value=float(st.session_state["start_coords"][0]), format="%.5f", key="man_start_lat")
+                with rc2:
+                    s_lon = st.number_input("Start Lon", value=float(st.session_state["start_coords"][1]), format="%.5f", key="man_start_lon")
+                st.session_state["start_coords"] = (s_lat, s_lon)
+
+                st.markdown("<div style='font-size:0.8rem; font-weight:700; color:#FF1744; margin-top:4px;'>DESTINATION COORDINATES</div>", unsafe_allow_html=True)
+                rc3, rc4 = st.columns(2)
+                with rc3:
+                    e_lat = st.number_input("End Lat", value=float(st.session_state["end_coords"][0]), format="%.5f", key="man_end_lat")
+                with rc4:
+                    e_lon = st.number_input("End Lon", value=float(st.session_state["end_coords"][1]), format="%.5f", key="man_end_lon")
+                st.session_state["end_coords"] = (e_lat, e_lon)
 
             # Execute Reroute Algorithm
-            if st.button("✨ Compute Safest Route", key="btn_compute_safe_route", use_container_width=True):
-                with st.spinner("Analyzing candidate routes & simulating urban risk grid..."):
+            if st.button("Compute Safer Route", key="btn_compute_safe_route", use_container_width=True):
+                with st.spinner("Analyzing candidate routes and evaluating urban risk grid..."):
                     route_result = get_reroute(
-                        start=(start_lat_val, start_lon_val),
-                        end=(end_lat_val, end_lon_val),
+                        start=st.session_state["start_coords"],
+                        end=st.session_state["end_coords"],
                         time=st.session_state["time_of_day"],
                     )
                     st.session_state["calculated_route"] = route_result
@@ -813,28 +862,28 @@ with tab_map:
             if st.session_state.get("calculated_route"):
                 r = st.session_state["calculated_route"]
                 r_band = r.get("risk_band", "low")
-                r_color = BAND_COLORS.get(r_band, "#00F59B")
-                badge_class = f"risk-badge-{r_band}"
+                r_color = BAND_COLORS.get(r_band, "#00E676")
+                badge_class = f"badge-{r_band}"
 
                 st.markdown("---")
                 st.markdown(
                     f"""
-                    <div style="background: rgba(14, 17, 38, 0.85); border: 1px solid {r_color}; border-radius: 12px; padding: 10px; margin-top: 6px;">
+                    <div style="background: rgba(14, 17, 38, 0.9); border: 1px solid {r_color}; border-radius: 10px; padding: 10px; margin-top: 6px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-weight: 700; color: #FFFFFF;">Safer Route Found:</span>
-                            <span class="{badge_class}">{BAND_ICONS.get(r_band, '🛡️')} {r_band.upper()} RISK</span>
+                            <span class="{badge_class}">[{r_band.upper()} RISK]</span>
                         </div>
                         <div style="margin-top: 6px; font-size: 0.82rem; color: #D4C9E6;">
-                            • <strong>Candidate Trajectories</strong>: {r.get('compared_routes', 5)} evaluated<br>
+                            • <strong>Candidate Paths Evaluated</strong>: {r.get('compared_routes', 5)} paths<br>
                             • <strong>Average Risk Score</strong>: <span style="color:{r_color}; font-weight:700;">{r.get('average_risk', 0.0)} / 100</span><br>
-                            • <strong>Route Visualization</strong>: Traced with Glowing Emerald Polyline on Map
+                            • <strong>Route Visualization</strong>: Rendered in solid green line on the map
                         </div>
                     </div>
                     """,
                     unsafe_allow_html=True,
                 )
 
-                if st.button("Clear Route from Map", key="btn_clear_route"):
+                if st.button("Clear Route", key="btn_clear_route"):
                     st.session_state["calculated_route"] = None
                     st.rerun()
 
@@ -842,19 +891,19 @@ with tab_map:
         # SUB-TAB 2: "FELT UNSAFE HERE" INSTANT REPORTER
         # ------------------------------------------------------------
         with deck_tab_report:
-            st.markdown("#### 🚨 Felt Unsafe Here?")
+            st.markdown("#### Felt Unsafe Here?")
             st.caption("Submit anonymous crowdsourced reports. Every report updates SafeGrid's risk grid instantly.")
 
             current_sel = st.session_state.get("selected_point", CITY_CENTER)
 
             rep_c1, rep_c2 = st.columns(2)
             with rep_c1:
-                rep_lat = st.number_input("Target Lat", value=float(current_sel[0]), format="%.5f", key="rep_lat_input")
+                rep_lat = st.number_input("Target Latitude", value=float(current_sel[0]), format="%.5f", key="rep_lat_input")
             with rep_c2:
-                rep_lon = st.number_input("Target Lon", value=float(current_sel[1]), format="%.5f", key="rep_lon_input")
+                rep_lon = st.number_input("Target Longitude", value=float(current_sel[1]), format="%.5f", key="rep_lon_input")
 
             incident_type = st.selectbox(
-                "Risk Factor / Incident Tag",
+                "Hazard / Incident Tag",
                 options=[
                     "Broken / Pitch Dark Streetlights",
                     "Suspicious Gathering / Loiterers",
@@ -870,27 +919,26 @@ with tab_map:
 
             optional_note = st.text_input(
                 "Optional Details",
-                placeholder="e.g., Narrow alley near market with no lighting",
+                placeholder="e.g., Narrow alley near market with flickering lighting",
                 key="rep_note_input",
             )
 
             st.markdown("<div class='sos-btn'>", unsafe_allow_html=True)
-            if st.button("🚨 SUBMIT ANONYMOUS ALERT", key="btn_submit_unsafe_report", use_container_width=True):
-                with st.spinner("Transmitting safety alert to SafeGrid network..."):
+            if st.button("Submit Anonymous Safety Alert", key="btn_submit_unsafe_report", use_container_width=True):
+                with st.spinner("Transmitting safety report to SafeGrid network..."):
                     res = submit_report(rep_lat, rep_lon, note=f"[{incident_type}] {optional_note}")
                     if res.get("success"):
                         st.session_state["report_success_toast"] = res
-                        st.success(f"✅ Report Logged ({res.get('report_id', 'LIVE')})! Risk grid updated.")
-                        st.balloons()
+                        st.success(f"Report Logged Successfully (Report ID: {res.get('report_id', 'LIVE')}). Risk grid updated.")
             st.markdown("</div>", unsafe_allow_html=True)
 
             if st.session_state.get("report_success_toast"):
                 last_rep = st.session_state["report_success_toast"]
                 st.markdown(
                     f"""
-                    <div style="background: rgba(0, 245, 155, 0.1); border: 1px solid #00F59B; border-radius: 10px; padding: 8px; margin-top: 8px; font-size: 0.8rem;">
+                    <div style="background: rgba(0, 230, 118, 0.1); border: 1px solid #00E676; border-radius: 8px; padding: 8px; margin-top: 8px; font-size: 0.8rem;">
                         <strong>ID:</strong> <code>{last_rep.get('report_id')}</code> | <strong>Segment:</strong> <code>{last_rep.get('segment_id')}</code><br>
-                        <span style="color:#00F59B;">Thank you for protecting our community! 💖</span>
+                        <span style="color:#00E676;">Thank you for protecting our community.</span>
                     </div>
                     """,
                     unsafe_allow_html=True,
@@ -900,7 +948,7 @@ with tab_map:
         # SUB-TAB 3: SPOT INSPECTOR
         # ------------------------------------------------------------
         with deck_tab_spot:
-            st.markdown("#### 🔍 Spot Safety Inspector")
+            st.markdown("#### Spot Safety Inspector")
             st.caption("Inspect live AI safety predictions for any coordinate or landmark in Bhubaneswar.")
 
             insp_landmark = st.selectbox(
@@ -915,21 +963,21 @@ with tab_map:
 
             cur_p = st.session_state.get("selected_point", CITY_CENTER)
 
-            if st.button("⚡ Inspect Spot Safety", key="btn_inspect_spot", use_container_width=True):
+            if st.button("Inspect Spot Safety", key="btn_inspect_spot", use_container_width=True):
                 spot_res = predict_risk(cur_p[0], cur_p[1], time=st.session_state["time_of_day"])
                 s_band = spot_res.get("band", "medium")
                 s_score = spot_res.get("score", 0.0)
-                s_color = BAND_COLORS.get(s_band, "#FFB800")
+                s_color = BAND_COLORS.get(s_band, "#FFB300")
 
                 st.markdown(
                     f"""
-                    <div style="background: rgba(18, 22, 48, 0.9); border: 1px solid {s_color}; border-radius: 12px; padding: 12px; margin-top: 10px;">
+                    <div style="background: rgba(18, 22, 48, 0.95); border: 1px solid {s_color}; border-radius: 10px; padding: 12px; margin-top: 10px;">
                         <div style="font-size: 0.75rem; color: #8E88A8;">PREDICTED RISK BAND</div>
                         <div style="font-size: 1.3rem; font-weight: 800; color: {s_color}; font-family: 'Space Grotesk';">
-                            {BAND_ICONS.get(s_band, '🛡️')} {s_band.upper()} RISK
+                            [{s_band.upper()} RISK]
                         </div>
                         <div style="font-size: 0.85rem; color: #D4C9E6; margin-top: 6px;">
-                            • <strong>Nearest Segment</strong>: <code>{spot_res.get('segment_id')}</code><br>
+                            • <strong>Nearest Segment ID</strong>: <code>{spot_res.get('segment_id')}</code><br>
                             • <strong>AI Risk Score</strong>: <span style="color:{s_color}; font-weight:700;">{s_score} / 100</span><br>
                             • <strong>Time Bucket</strong>: {spot_res.get('time_bucket', '').upper()}
                         </div>
@@ -942,8 +990,8 @@ with tab_map:
 # TAB 2: SOS GUARDIAN & ALARM HUB
 # ==============================================================================
 with tab_sos:
-    st.markdown('<div class="glam-title">🚨 SOS EMERGENCY COMMAND HUB</div>', unsafe_allow_html=True)
-    st.markdown('<div class="glam-subtitle">Instant Panic Triggers, Deterrent Alarms, Fake Calls & Rapid Dispatch</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-title">EMERGENCY COMMAND HUB</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-subtitle">Instant Panic Triggers, Deterrent Siren, Fake Calls and Rapid Broadcast</div>', unsafe_allow_html=True)
 
     sos_col1, sos_col2 = st.columns([1, 1])
 
@@ -951,9 +999,9 @@ with tab_sos:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#FF2A55 !important;">⚡ 1-Tap Emergency Broadcast</h3>
+                <h3 style="color:#FF1744 !important;">1-Tap Emergency Broadcast</h3>
                 <p style="color:#D4C9E6; font-size:0.88rem;">
-                    Generates a pre-formatted high-priority distress message with live GPS coordinates, Google Maps link, and current time for WhatsApp or SMS rapid broadcast to your emergency circle.
+                    Generates a formatted distress message with live GPS coordinates, Google Maps link, and current time for WhatsApp or SMS rapid broadcast to your emergency circle.
                 </p>
             </div>
             """,
@@ -962,9 +1010,9 @@ with tab_sos:
 
         curr_loc = st.session_state.get("selected_point", CITY_CENTER)
         maps_link = f"https://maps.google.com/?q={curr_loc[0]:.6f},{curr_loc[1]:.6f}"
-        distress_msg = f"🚨 EMERGENCY SOS from SafeGrid! I feel unsafe right now. My current location is: {maps_link} at {datetime.now().strftime('%H:%M:%S')}. Please check on me or dispatch help immediately."
+        distress_msg = f"EMERGENCY SOS from SafeGrid. I feel unsafe right now. My current location is: {maps_link} at {datetime.now().strftime('%H:%M:%S')}. Please check on me or dispatch help immediately."
 
-        st.text_area("Prepared Distress Broadcast Message", value=distress_msg, height=90, key="sos_msg_box")
+        st.text_area("Prepared Distress Message", value=distress_msg, height=90, key="sos_msg_box")
 
         c_wa, c_sms = st.columns(2)
         with c_wa:
@@ -972,8 +1020,8 @@ with tab_sos:
             st.markdown(
                 f"""
                 <a href="{wa_url}" target="_blank" style="text-decoration:none;">
-                    <div style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 10px; border-radius: 10px; text-align: center; font-weight: 700; font-size: 0.92rem; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);">
-                        💬 Share on WhatsApp
+                    <div style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);">
+                        Share on WhatsApp
                     </div>
                 </a>
                 """,
@@ -984,8 +1032,8 @@ with tab_sos:
             st.markdown(
                 f"""
                 <a href="{sms_url}" style="text-decoration:none;">
-                    <div style="background: linear-gradient(135deg, #FF2A85 0%, #B71C5A 100%); color: white; padding: 10px; border-radius: 10px; text-align: center; font-weight: 700; font-size: 0.92rem; box-shadow: 0 4px 15px rgba(255, 42, 133, 0.4);">
-                        📲 Send Direct SMS
+                    <div style="background: linear-gradient(135deg, #FF2A85 0%, #B71C5A 100%); color: white; padding: 10px; border-radius: 8px; text-align: center; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 12px rgba(255, 42, 133, 0.4);">
+                        Send Direct SMS
                     </div>
                 </a>
                 """,
@@ -998,13 +1046,13 @@ with tab_sos:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#FFB800 !important;">🔊 High-Decibel Deterrent Siren</h3>
+                <h3 style="color:#FFB300 !important;">High-Decibel Deterrent Siren</h3>
                 <p style="color:#D4C9E6; font-size:0.85rem;">
                     Activate an in-browser acoustic warning pulse to attract public attention and deter potential aggressors.
                 </p>
                 <div style="text-align: center; margin-top: 10px;">
-                    <button id="sirenBtn" onclick="toggleSiren()" style="background: linear-gradient(135deg, #FFB800 0%, #FF5500 100%); border: none; color: white; padding: 10px 24px; border-radius: 999px; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 0 15px rgba(255, 184, 0, 0.4);">
-                        🚨 TOGGLE SIREN ALARM
+                    <button id="sirenBtn" onclick="toggleSiren()" style="background: linear-gradient(135deg, #FFB300 0%, #FF5500 100%); border: none; color: white; padding: 10px 24px; border-radius: 999px; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 0 15px rgba(255, 179, 0, 0.4);">
+                        TOGGLE SIREN ALARM
                     </button>
                     <div id="sirenStatus" style="margin-top: 6px; font-size: 0.78rem; color: #A99EBE;">Click to start audio frequency alarm</div>
                 </div>
@@ -1042,10 +1090,10 @@ with tab_sos:
                     }, 350);
 
                     isSirenOn = true;
-                    btn.innerText = "🛑 STOP SIREN ALARM";
-                    btn.style.background = "#FF2A55";
-                    status.innerText = "🔊 SIREN ACTIVE — Pulsing high decibel alert!";
-                    status.style.color = "#FF2A55";
+                    btn.innerText = "STOP SIREN ALARM";
+                    btn.style.background = "#FF1744";
+                    status.innerText = "SIREN ACTIVE - Pulsing high decibel alert";
+                    status.style.color = "#FF1744";
                 } else {
                     if (osc) {
                         osc.stop();
@@ -1054,8 +1102,8 @@ with tab_sos:
                     }
                     if (sirenInterval) clearInterval(sirenInterval);
                     isSirenOn = false;
-                    btn.innerText = "🚨 TOGGLE SIREN ALARM";
-                    btn.style.background = "linear-gradient(135deg, #FFB800 0%, #FF5500 100%)";
+                    btn.innerText = "TOGGLE SIREN ALARM";
+                    btn.style.background = "linear-gradient(135deg, #FFB300 0%, #FF5500 100%)";
                     status.innerText = "Siren Deactivated.";
                     status.style.color = "#A99EBE";
                 }
@@ -1070,7 +1118,7 @@ with tab_sos:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#00F0FF !important;">📞 Fake Call Assistant</h3>
+                <h3 style="color:#00F0FF !important;">Fake Call Assistant</h3>
                 <p style="color:#D4C9E6; font-size:0.88rem;">
                     Need a tactical escape from an uncomfortable situation or deserted street? Trigger a simulated incoming phone call.
                 </p>
@@ -1081,31 +1129,30 @@ with tab_sos:
 
         caller_id = st.selectbox(
             "Select Simulated Caller Identity",
-            options=["Mom 💕", "Inspector Sharma 👮", "SafeGrid Emergency Dispatch 🛡️", "Cab Support Partner 🚕", "Boss / Colleague 🏢"],
+            options=["Family Member", "Police Control Room", "SafeGrid Emergency Dispatch", "Cab Partner Support", "Office Manager"],
             key="fake_caller_select",
         )
 
-        if st.button("📲 TRIGGER INCOMING CALL NOW", key="btn_trigger_fake_call", use_container_width=True):
+        if st.button("Trigger Incoming Call Now", key="btn_trigger_fake_call", use_container_width=True):
             st.session_state["fake_call_step"] = "ringing"
 
         if st.session_state.get("fake_call_step") == "ringing":
             st.markdown(
                 f"""
-                <div style="background: radial-gradient(circle, rgba(255,42,133,0.2) 0%, rgba(10,12,28,0.95) 100%); border: 2px solid #FF2A85; border-radius: 18px; padding: 20px; text-align: center; box-shadow: 0 0 30px rgba(255,42,133,0.4); margin-top: 12px;">
-                    <div style="font-size: 2.8rem; animation: pulse 1s infinite;">📲</div>
+                <div style="background: radial-gradient(circle, rgba(255,42,133,0.2) 0%, rgba(10,12,28,0.95) 100%); border: 2px solid #FF2A85; border-radius: 14px; padding: 20px; text-align: center; box-shadow: 0 0 25px rgba(255,42,133,0.4); margin-top: 12px;">
                     <div style="font-size: 0.8rem; color: #8E88A8; text-transform: uppercase;">Incoming SafeCall</div>
                     <div style="font-family: 'Space Grotesk'; font-size: 1.6rem; font-weight: 800; color: #FFFFFF; margin: 4px 0;">{caller_id}</div>
-                    <div style="font-size: 0.78rem; color: #00F59B;">Bhubaneswar Verified ID • SafeLine Active</div>
+                    <div style="font-size: 0.78rem; color: #00E676;">Verified SafeLine Active</div>
                     <div style="margin-top: 15px;">
-                        <button onclick="alert('Call Answered: Simulated dialogue playing...')" style="background: #00F59B; color: #000; border: none; padding: 10px 20px; border-radius: 999px; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 0 15px #00F59B;">
-                            📞 ACCEPT CALL
+                        <button onclick="alert('Call Answered: Simulated dialogue playing')" style="background: #00E676; color: #000; border: none; padding: 10px 20px; border-radius: 999px; font-weight: 800; font-size: 0.95rem; cursor: pointer; box-shadow: 0 0 12px #00E676;">
+                            ACCEPT CALL
                         </button>
                     </div>
                 </div>
                 """,
                 unsafe_allow_html=True,
             )
-            if st.button("❌ Dismiss Call", key="btn_dismiss_call"):
+            if st.button("Dismiss Call", key="btn_dismiss_call"):
                 st.session_state["fake_call_step"] = "idle"
                 st.rerun()
 
@@ -1113,8 +1160,8 @@ with tab_sos:
 # TAB 3: WALK-WITH-ME COMPANION
 # ==============================================================================
 with tab_companion:
-    st.markdown('<div class="glam-title">🚶‍♀️ WALK-WITH-ME GUARDIAN COMPANION</div>', unsafe_allow_html=True)
-    st.markdown('<div class="glam-subtitle">Live Safety Interval Check-ins & Automatic Panic Alert Timers</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-title">WALK-WITH-ME GUARDIAN COMPANION</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-subtitle">Live Safety Interval Check-ins and Automatic Panic Alert Timers</div>', unsafe_allow_html=True)
 
     w_col1, w_col2 = st.columns([1, 1])
 
@@ -1122,9 +1169,9 @@ with tab_companion:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#00F59B !important;">⏱️ Safety Check-in Timer</h3>
+                <h3 style="color:#00E676 !important;">Safety Check-in Timer</h3>
                 <p style="color:#D4C9E6; font-size:0.88rem;">
-                    Set your expected travel duration. If you do not tap <strong>"I Have Arrived Safely"</strong> before the timer expires, SafeGrid prepares an automated emergency broadcast.
+                    Set your expected travel duration. If you do not confirm safe arrival before the timer expires, SafeGrid prepares an automated emergency broadcast.
                 </p>
             </div>
             """,
@@ -1140,22 +1187,21 @@ with tab_companion:
 
         c_start_t, c_stop_t = st.columns(2)
         with c_start_t:
-            if st.button("🟢 Start Guardian Session", key="btn_start_companion", use_container_width=True):
+            if st.button("Start Guardian Watch", key="btn_start_companion", use_container_width=True):
                 st.session_state["companion_active"] = True
-                st.success("✨ Guardian Mode Active! SafeGrid is monitoring your journey.")
+                st.success("Guardian Watch Active. SafeGrid is monitoring your journey window.")
         with c_stop_t:
-            if st.button("💖 I Have Arrived Safely", key="btn_stop_companion", use_container_width=True):
+            if st.button("Mark Safe Arrival", key="btn_stop_companion", use_container_width=True):
                 st.session_state["companion_active"] = False
-                st.balloons()
-                st.success("🎉 Wonderful! Trip completed safely.")
+                st.success("Journey marked complete safely.")
 
         if st.session_state.get("companion_active"):
             st.markdown(
                 f"""
-                <div style="background: rgba(0, 245, 155, 0.12); border: 1px solid #00F59B; border-radius: 12px; padding: 12px; margin-top: 12px; text-align: center;">
-                    <div style="font-size: 1.15rem; font-weight: 700; color: #00F59B;">🛡️ GUARDIAN WATCH ACTIVE</div>
+                <div style="background: rgba(0, 230, 118, 0.12); border: 1px solid #00E676; border-radius: 10px; padding: 12px; margin-top: 12px; text-align: center;">
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #00E676;">GUARDIAN WATCH ACTIVE</div>
                     <div style="font-size: 0.85rem; color: #FFFFFF; margin: 3px 0;">Destination: <strong>{destination_label}</strong></div>
-                    <div style="font-size: 0.78rem; color: #A99EBE;">Window: {trip_minutes} mins • Automated watchdog running</div>
+                    <div style="font-size: 0.78rem; color: #A99EBE;">Window: {trip_minutes} mins | Watchdog running</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -1165,13 +1211,13 @@ with tab_companion:
         st.markdown(
             """
             <div class="glam-card">
-                <h3 style="color:#FFB8D9 !important;">✨ Pre-Transit Safety Checklist</h3>
+                <h3 style="color:#FFB8D9 !important;">Pre-Transit Safety Checklist</h3>
                 <ul style="color:#D4C9E6; font-size:0.88rem; line-height:1.8;">
-                    <li>🔋 <strong>Phone Battery</strong>: Keep charged above 20%</li>
-                    <li>📍 <strong>Live Location</strong>: Share with trusted emergency contact</li>
-                    <li>🎧 <strong>Situational Awareness</strong>: Keep one ear free from headphones</li>
-                    <li>🔦 <strong>Well-lit Paths</strong>: Follow SafeGrid's emerald routing</li>
-                    <li>🚨 <strong>Quick Access</strong>: Keep SafeGrid open in browser</li>
+                    <li><strong>Phone Battery</strong>: Keep charged above 20%</li>
+                    <li><strong>Live Location</strong>: Share with trusted emergency contact</li>
+                    <li><strong>Situational Awareness</strong>: Keep one ear free from headphones</li>
+                    <li><strong>Well-lit Paths</strong>: Follow SafeGrid's green route guidance</li>
+                    <li><strong>Quick Access</strong>: Keep SafeGrid open in mobile browser</li>
                 </ul>
             </div>
             """,
@@ -1182,8 +1228,8 @@ with tab_companion:
 # TAB 4: COMMUNITY INCIDENT FEED
 # ==============================================================================
 with tab_feed:
-    st.markdown('<div class="glam-title">📢 COMMUNITY INCIDENT FEED</div>', unsafe_allow_html=True)
-    st.markdown('<div class="glam-subtitle">Crowdsourced Vigilance & Real-Time Incident Reports Across Bhubaneswar</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-title">COMMUNITY INCIDENT FEED</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-subtitle">Crowdsourced Vigilance and Real-Time Incident Reports Across Bhubaneswar</div>', unsafe_allow_html=True)
 
     if os.path.exists(REPORTS_PATH):
         reports_df = pd.read_csv(REPORTS_PATH)
@@ -1227,8 +1273,8 @@ with tab_feed:
 # TAB 5: CITY SAFETY ANALYTICS
 # ==============================================================================
 with tab_analytics:
-    st.markdown('<div class="glam-title">📊 URBAN SAFETY INTELLIGENCE</div>', unsafe_allow_html=True)
-    st.markdown('<div class="glam-subtitle">Statistical Safety Profiles, Lighting Correlations & Vulnerability Patterns</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-title">URBAN SAFETY INTELLIGENCE</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-subtitle">Statistical Safety Profiles, Lighting Correlations and Vulnerability Patterns</div>', unsafe_allow_html=True)
 
     an_col1, an_col2 = st.columns(2)
 
@@ -1236,7 +1282,7 @@ with tab_analytics:
         st.markdown(
             """
             <div class="glam-card">
-                <h3>🌆 Risk Distribution by Time Bucket</h3>
+                <h3>Risk Distribution by Time Bucket</h3>
             </div>
             """,
             unsafe_allow_html=True,
@@ -1261,13 +1307,13 @@ with tab_analytics:
         st.markdown(
             """
             <div class="glam-card">
-                <h3>💡 Key Risk Influencers (XGBoost Weights)</h3>
+                <h3>Key Risk Influencers (XGBoost Weights)</h3>
                 <p style="color:#D4C9E6; font-size:0.88rem; line-height:1.7;">
-                    • <strong>Lighting Score & Operational Streetlight %</strong>: 38% predictive weight<br>
-                    • <strong>Historical Incidents & Annual Crime Records</strong>: 26% predictive weight<br>
-                    • <strong>Crowd Volume & Density by Time-of-Day</strong>: 18% predictive weight<br>
-                    • <strong>Crowdsourced "Felt Unsafe" Real-time Reports</strong>: 12% dynamic weight<br>
-                    • <strong>Urban Zone Type & Distance to Center</strong>: 6% structural weight
+                    • <strong>Lighting Score and Streetlight Operational %</strong>: 38% predictive weight<br>
+                    • <strong>Historical Incidents and Annual Police Records</strong>: 26% predictive weight<br>
+                    • <strong>Crowd Volume and Density by Time-of-Day</strong>: 18% predictive weight<br>
+                    • <strong>Crowdsourced Unsafe Real-time Reports</strong>: 12% dynamic weight<br>
+                    • <strong>Urban Zone Type and Distance to Center</strong>: 6% structural weight
                 </p>
             </div>
             """,
@@ -1275,18 +1321,18 @@ with tab_analytics:
         )
 
 # ==============================================================================
-# TAB 6: ABOUT & MODEL ARCHITECTURE
+# TAB 6: ABOUT AND MODEL ARCHITECTURE
 # ==============================================================================
 with tab_about:
-    st.markdown('<div class="glam-title">ℹ️ ABOUT CODE COVEN & SAFEGRID</div>', unsafe_allow_html=True)
-    st.markdown('<div class="glam-subtitle">Empowering Women with Predictive Urban Safety & Machine Learning</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-title">ABOUT CODE COVEN AND SAFEGRID</div>', unsafe_allow_html=True)
+    st.markdown('<div class="glam-subtitle">Empowering Women with Predictive Urban Safety and Machine Learning</div>', unsafe_allow_html=True)
 
     st.markdown(
         """
         <div class="glam-card">
-            <h3 style="color:#FF2A85 !important;">🌟 Mission: Autonomous Safety Before Danger Strikes</h3>
+            <h3 style="color:#FF2A85 !important;">Mission: Autonomous Safety Before Danger Strikes</h3>
             <p style="color:#D4C9E6; font-size:0.92rem; line-height:1.7;">
-                Most safety applications only act <em>after</em> an incident occurs (emergency triggers and panics). 
+                Most safety applications only act after an incident occurs (emergency triggers and panics). 
                 <strong>SafeGrid</strong> shifts the paradigm from reactive rescue to <strong>proactive prevention</strong>.
                 By synthesizing geospatial infrastructure data, operational street lighting, crowd volume dynamics, historical incident frequencies, and live anonymous crowdsourced vigilance reports, SafeGrid enables women to navigate cities with confidence and clarity.
             </p>
@@ -1300,12 +1346,12 @@ with tab_about:
         st.markdown(
             """
             <div class="glam-card">
-                <h4>🧠 ML Pipeline & Architecture</h4>
+                <h4>ML Pipeline and Architecture</h4>
                 <p style="color:#D4C9E6; font-size:0.86rem; line-height:1.6;">
                     • <strong>Engine</strong>: Gradient Boosted Decision Trees (XGBoost Regressor & Classifier)<br>
-                    • <strong>Geospatial Mesh</strong>: 500m hexagonal & square grid cells across Bhubaneswar<br>
-                    • <strong>Quantile Thresholds</strong>: Low (≤25.1), Medium (25.2–40.4), High (>40.4)<br>
-                    • <strong>Safer Rerouting</strong>: Multi-path sinusoidal candidate optimization
+                    • <strong>Geospatial Mesh</strong>: 500m hexagonal and square grid cells across Bhubaneswar<br>
+                    • <strong>Quantile Thresholds</strong>: Low (<=25.1), Medium (25.2-40.4), High (>40.4)<br>
+                    • <strong>Safer Rerouting</strong>: Multi-path candidate trajectory optimization
                 </p>
             </div>
             """,
@@ -1315,9 +1361,9 @@ with tab_about:
         st.markdown(
             """
             <div class="glam-card">
-                <h4>💖 Code Coven • Infinity Hacks 2026</h4>
+                <h4>Code Coven | Infinity Hacks 2026</h4>
                 <p style="color:#D4C9E6; font-size:0.86rem; line-height:1.6;">
-                    Built with love, technology, and resilience for every woman walking home under the night sky.
+                    Built with technology and resilience for every woman navigating the city.
                 </p>
             </div>
             """,
@@ -1331,7 +1377,7 @@ st.markdown("---")
 st.markdown(
     """
     <div style="text-align: center; color: #8E88A8; font-size: 0.78rem; padding: 8px 0;">
-        SafeGrid AI Matrix v2.0 • Team Code Coven • Infinity Hacks 2026 • Dedicated to Women Safety Everywhere 🛡️✨
+        SafeGrid AI Matrix v2.0 | Team Code Coven | Infinity Hacks 2026 | Dedicated to Women Safety Everywhere
     </div>
     """,
     unsafe_allow_html=True,
